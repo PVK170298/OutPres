@@ -1,0 +1,2671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GetTogether Live Event Operations Console & Presentation</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Google Fonts: Bungee, Fredoka, Plus Jakarta Sans, Space Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Fredoka"', 'cursive'],
+            party: ['"Bungee"', 'sans-serif'],
+            mono: ['"Space Mono"', 'monospace'],
+          },
+          colors: {
+            azure: {
+              DEFAULT: '#179EDA',
+              400: '#38bdf8',
+              500: '#179EDA',
+              600: '#0284c7',
+            },
+            tealBlue: {
+              DEFAULT: '#028090',
+              deep: '#005f73',
+              vibrant: '#00a896',
+              mint: '#02c39a',
+            },
+            neon: {
+              sun: '#FFBE0B',
+              coral: '#FF006E',
+              flamingo: '#FF5A5F',
+              mint: '#06D6A0',
+              purple: '#8338EC',
+            },
+            marine: {
+              950: '#030C16',
+              900: '#041525',
+              850: '#051A2E',
+              800: '#09253F',
+            }
+          },
+          animation: {
+            'float': 'floatAnim 5s ease-in-out infinite',
+            'marquee': 'marqueeScroll 48s linear infinite',
+          },
+          keyframes: {
+            floatAnim: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+            marqueeScroll: {
+              '0%': { transform: 'translateX(0%)' },
+              '100%': { transform: 'translateX(-50%)' }
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #030C16;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .mesh-gradient-bg {
+      background-color: #030C16;
+      background-image: 
+        radial-gradient(circle at 10% 12%, rgba(23, 158, 218, 0.35) 0px, transparent 45%),
+        radial-gradient(circle at 90% 14%, rgba(0, 168, 150, 0.32) 0px, transparent 46%),
+        radial-gradient(circle at 50% 92%, rgba(255, 190, 11, 0.18) 0px, transparent 42%),
+        radial-gradient(circle at 82% 82%, rgba(255, 0, 110, 0.18) 0px, transparent 40%),
+        radial-gradient(circle at 18% 78%, rgba(2, 128, 144, 0.28) 0px, transparent 48%);
+    }
+
+    .slide-viewport {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .slide-card {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: scale(0.985) translateY(8px);
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0.75rem 2rem 0.85rem 2rem;
+    }
+
+    .slide-card.active-slide {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    .glow-azure {
+      box-shadow: 0 0 28px -4px rgba(23, 158, 218, 0.6);
+    }
+    .glow-teal {
+      box-shadow: 0 0 28px -4px rgba(0, 168, 150, 0.55);
+    }
+    .glow-coral {
+      box-shadow: 0 0 26px -4px rgba(255, 0, 110, 0.55);
+    }
+    .glow-sun {
+      box-shadow: 0 0 26px -4px rgba(255, 190, 11, 0.55);
+    }
+
+    .glass-card {
+      background: rgba(4, 21, 37, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(23, 158, 218, 0.28);
+    }
+
+    .admin-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .admin-scroll::-webkit-scrollbar-thumb {
+      background: #179EDA;
+      border-radius: 9999px;
+    }
+    .admin-scroll::-webkit-scrollbar-track {
+      background: #030C16;
+    }
+
+    .marquee-container:hover .marquee-content {
+      animation-play-state: paused;
+    }
+  </style>
+</head>
+
+<body class="mesh-gradient-bg text-white font-sans antialiased flex flex-col justify-between relative selection:bg-azure selection:text-black">
+
+  <!-- Ambient Dynamic Canvas -->
+  <canvas id="ambientCanvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- ======================================================== -->
+  <!-- CLEAN PUBLIC HEADER (NO WAKELOCK/CLOUD PILLS ON STAGE)    -->
+  <!-- ======================================================== -->
+  <header class="relative z-30 w-full px-4 sm:px-6 py-2 border-b border-azure/25 bg-marine-950/90 backdrop-blur-md flex items-center justify-between shadow-2xl">
+    
+    <!-- LEFT: Left Logo + Dynamic Event Title, Date & Location -->
+    <div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+      <!-- Left Logo Slot -->
+      <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-tealBlue via-azure to-neon-sun p-0.5 shadow-lg transform -rotate-1 hover:rotate-0 transition flex-shrink-0 flex items-center justify-center overflow-hidden border border-white/20">
+        <img id="navLeftLogo" src="" alt="Left Logo" class="w-full h-full object-cover rounded-[14px]" onerror="this.onerror=null; this.src='https://placehold.co/120x120/028090/ffffff?text=OUTING';">
+      </div>
+      
+      <!-- Event Title, Date Badge & Venue Location -->
+      <div class="leading-tight">
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Event Date Badge -->
+          <div id="navDateBadge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-azure/20 text-cyan-200 border border-azure/40">
+            <i class="fa-regular fa-calendar-days text-neon-sun text-[10px]"></i>
+            <span id="navDateText">Oct 15, 2026</span>
+          </div>
+
+          <!-- Venue Location Badge -->
+          <div id="navVenueBadge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-tealBlue/20 text-tealBlue-mint border border-tealBlue-vibrant/40">
+            <i class="fa-solid fa-location-dot text-neon-coral text-[10px]"></i>
+            <span id="navVenueText" class="truncate max-w-[180px] sm:max-w-xs">Whispering Palms Beachfront, Goa</span>
+          </div>
+        </div>
+        <h1 id="navEventTitle" class="text-base sm:text-xl font-party tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-azure via-cyan-200 to-neon-sun truncate max-w-[220px] sm:max-w-md drop-shadow mt-0.5">
+          GETTOGETHER 2026
+        </h1>
+      </div>
+    </div>
+
+    <!-- CENTER TELEMETRY: Weather & Real-time Seconds Venue Clock -->
+    <div class="hidden lg:flex items-center gap-3.5 bg-marine-900/90 border border-azure/30 px-4 py-1.5 rounded-2xl glow-azure">
+      <!-- Live Open-Meteo Weather -->
+      <div class="flex items-center gap-2 font-mono">
+        <span id="weatherIconContainer" class="text-lg text-neon-sun animate-float">
+          <i id="weatherIcon" class="fa-solid fa-sun"></i>
+        </span>
+        <div class="text-left leading-none">
+          <div class="flex items-center gap-1">
+            <span id="weatherTemp" class="text-sm font-black text-white">--°C</span>
+            <span id="weatherCity" class="text-[10px] font-bold text-azure uppercase tracking-wider">Resort</span>
+          </div>
+          <div id="weatherCondition" class="text-[9px] text-slate-300 font-sans mt-0.5">Syncing Weather...</div>
+        </div>
+      </div>
+      
+      <div class="h-6 w-px bg-white/15"></div>
+
+      <!-- Real-Time Seconds Clock -->
+      <div class="font-mono text-center">
+        <div id="clockDisplay" class="text-sm font-bold text-neon-mint leading-none">--:--:--</div>
+        <div class="text-[9px] uppercase tracking-widest text-slate-400 mt-0.5">Venue Time</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Clean Slide Dock, Slides Popup Button, Confetti, Admin & Right Logo -->
+    <div class="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
+      
+      <!-- Slide Manual Controls (Prev / Next only - NO numbers) -->
+      <div class="flex items-center bg-marine-900/90 border border-white/15 rounded-2xl p-1 shadow-inner">
+        <button onclick="prevSlide()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-azure hover:text-black flex items-center justify-center transition active:scale-90" title="Previous Slide (← or PageUp)">
+          <i class="fa-solid fa-chevron-left text-xs"></i>
+        </button>
+
+        <!-- Slide Navigator Drawer Trigger -->
+        <button onclick="toggleSlideSelectorModal()" class="px-2.5 h-8 mx-1 rounded-xl bg-marine-800/80 hover:bg-azure hover:text-black text-azure border border-azure/40 font-mono text-xs font-bold flex items-center gap-1.5 transition active:scale-95" title="Open Slide Navigator">
+          <i class="fa-solid fa-bars text-xs"></i>
+          <span class="hidden sm:inline">Slides</span>
+        </button>
+
+        <button onclick="nextSlide()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-azure hover:text-black flex items-center justify-center transition active:scale-90" title="Next Slide (→ or PageDown)">
+          <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Confetti Wand Trigger -->
+      <button onclick="blastConfetti(true)" class="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-gradient-to-tr from-neon-coral via-neon-flamingo to-neon-sun hover:scale-105 active:scale-95 text-white flex items-center justify-center shadow-lg transition glow-coral" title="Blast Celebration Confetti (Spacebar)">
+        <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+      </button>
+
+      <!-- Fullscreen Toggle -->
+      <button onclick="toggleFullScreen()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-azure flex items-center justify-center transition" title="Toggle Fullscreen (F)">
+        <i class="fa-solid fa-expand text-xs"></i>
+      </button>
+
+      <!-- Admin Studio Trigger -->
+      <button onclick="openAdmin()" class="px-3 py-1.5 rounded-2xl bg-gradient-to-r from-azure to-tealBlue-vibrant hover:brightness-110 text-black font-party text-xs transition flex items-center gap-1.5 shadow-md active:scale-95 glow-azure" title="Admin Studio (A)">
+        <i class="fa-solid fa-sliders text-xs"></i>
+        <span class="hidden sm:inline">Admin</span>
+      </button>
+
+      <!-- Right Logo Slot -->
+      <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-neon-coral via-azure to-tealBlue-mint p-0.5 shadow-lg transform rotate-1 hover:rotate-0 transition flex-shrink-0 flex items-center justify-center overflow-hidden border border-white/20">
+        <img id="navRightLogo" src="" alt="Right Logo" class="w-full h-full object-cover rounded-[14px]" onerror="this.onerror=null; this.src='https://placehold.co/120x120/179EDA/ffffff?text=OUTING';">
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- FLOATING SLIDE COUNTDOWN TIMER HUD                       -->
+  <!-- ======================================================== -->
+  <div id="slideTimerHUD" class="fixed top-16 right-6 z-40 hidden flex items-center gap-3 bg-marine-950/95 border-2 border-neon-sun rounded-2xl px-4 py-2 shadow-2xl glow-sun backdrop-blur-md">
+    <div class="flex items-center gap-2">
+      <span class="text-neon-sun text-base animate-pulse"><i class="fa-solid fa-stopwatch"></i></span>
+      <div class="font-mono">
+        <div id="timerDigitsDisplay" class="text-xl font-black text-neon-sun leading-none tracking-wider">05:00</div>
+        <div class="text-[9px] uppercase tracking-widest text-slate-400 mt-0.5">Slide Timer</div>
+      </div>
+    </div>
+    
+    <div class="h-6 w-px bg-white/20 mx-1"></div>
+
+    <div class="flex items-center gap-1.5">
+      <button id="btnTimerStartPause" onclick="toggleSlideTimer()" class="w-7 h-7 rounded-xl bg-neon-sun hover:bg-yellow-400 text-black flex items-center justify-center text-xs font-bold transition active:scale-90" title="Start / Pause">
+        <i id="timerIconState" class="fa-solid fa-play"></i>
+      </button>
+      <button onclick="resetSlideTimer()" class="w-7 h-7 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center text-xs transition active:scale-90" title="Reset Timer">
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MAIN FULL-SCREEN PRESENTATION STAGE                      -->
+  <!-- ======================================================== -->
+  <main class="relative z-10 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden">
+    <div id="slideViewport" class="slide-viewport">
+      <!-- Injected dynamically via renderSlides() -->
+    </div>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- FOOTER: HORIZONTAL SCHEDULE TIMELINE SCROLL MARQUEE      -->
+  <!-- ======================================================== -->
+  <footer class="relative z-30 w-full bg-marine-950/95 border-t border-tealBlue/40 px-3 sm:px-5 py-2 flex items-center justify-between shadow-2xl">
+    <div class="flex items-center w-full overflow-hidden marquee-container">
+      <div class="flex-shrink-0 bg-gradient-to-r from-azure to-tealBlue text-black font-party text-[11px] px-3 py-1 rounded-xl uppercase tracking-wider mr-3 flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-clock text-[10px]"></i> TIME SCHEDULE
+      </div>
+      
+      <div class="overflow-hidden whitespace-nowrap flex-1 relative mask-gradient">
+        <div id="scheduleMarqueeTrack" class="marquee-content inline-flex items-center animate-marquee space-x-6 font-mono text-xs">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- SLIDE NAVIGATOR POPUP DRAWER (HAMBURGER MODAL)           -->
+  <!-- ======================================================== -->
+  <div id="slideNavigatorModal" class="fixed inset-0 bg-marine-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 transition-all duration-200">
+    <div class="bg-marine-900 border-2 border-azure rounded-3xl w-full max-w-4xl p-6 shadow-2xl flex flex-col max-h-[85vh] glow-azure">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-azure to-tealBlue-vibrant text-black flex items-center justify-center text-lg shadow-md font-party">
+            <i class="fa-solid fa-layer-group text-sm"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-party text-azure">Slide Navigator</h3>
+            <p class="text-xs font-mono text-slate-400">Jump directly to any slide without screen clutter</p>
+          </div>
+        </div>
+        <button onclick="toggleSlideSelectorModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Slide Cards Grid -->
+      <div id="slideNavigatorGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 my-4 overflow-y-auto admin-scroll pr-1 font-mono text-xs">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-400">
+        <span>Use <strong>[← / →]</strong> arrows or click anywhere to jump</span>
+        <button onclick="openAdmin(); toggleSlideSelectorModal();" class="text-azure hover:underline flex items-center gap-1">
+          <i class="fa-solid fa-sliders text-[10px]"></i> Open Slide Editor
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- ADMIN STUDIO DRAWER                                      -->
+  <!-- ======================================================== -->
+  <div id="adminDrawer" class="fixed inset-0 bg-marine-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-5 transition-all duration-300">
+    <div class="bg-marine-900 border-2 border-azure rounded-3xl w-full max-w-5xl h-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden glow-azure">
+      
+      <!-- Drawer Header -->
+      <div class="px-6 py-4 border-b border-azure/20 bg-marine-950/90 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-azure to-tealBlue-vibrant text-black flex items-center justify-center text-lg font-party shadow-md">
+            ⚙️
+          </div>
+          <div>
+            <h2 class="text-xl font-party text-azure">Operations & Slide Admin Studio</h2>
+            <p class="text-xs font-mono text-slate-400">Configure slides, hosting, cloud sync, Gemini prompt state, and stage wake lock.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- 1-Click Gemini Sync State Button -->
+          <button onclick="copyGeminiSyncPrompt()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-neon-purple to-azure hover:brightness-110 text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-md transition" title="Copies full state as a prompt ready to paste into Gemini chat">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Copy Gemini State
+          </button>
+          <button onclick="exportJSON()" class="px-3 py-1.5 rounded-xl bg-marine-800 hover:bg-marine-700 text-xs font-mono border border-azure/30 text-cyan-200 flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-download"></i> Export JSON
+          </button>
+          <label class="px-3 py-1.5 rounded-xl bg-marine-800 hover:bg-marine-700 text-xs font-mono border border-azure/30 text-cyan-200 flex items-center gap-1.5 cursor-pointer transition">
+            <i class="fa-solid fa-upload"></i> Import JSON
+            <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importJSON(event)">
+          </label>
+          <button onclick="resetDefaults()" class="px-3 py-1.5 rounded-xl bg-rose-950 hover:bg-rose-900 text-rose-300 text-xs font-mono border border-rose-600/40 transition">
+            Reset Demo
+          </button>
+          <button onclick="closeAdmin()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-rose-600 hover:text-white flex items-center justify-center text-base transition">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Navigator -->
+      <div class="flex border-b border-azure/20 bg-marine-950/50 px-6 font-mono text-xs overflow-x-auto">
+        <button id="tabBtnSlides" onclick="switchAdminTab('slides')" class="py-3 px-4 border-b-2 border-azure font-bold text-azure flex items-center gap-2 flex-shrink-0">
+          <i class="fa-solid fa-layer-group"></i> Manage Slides
+        </button>
+        <button id="tabBtnSystem" onclick="switchAdminTab('system')" class="py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0">
+          <i class="fa-solid fa-cloud-bolt"></i> System, Cloud & WakeLock
+        </button>
+        <button id="tabBtnHosting" onclick="switchAdminTab('hosting')" class="py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0">
+          <i class="fa-solid fa-globe"></i> Hosting & Gemini Sync Guide
+        </button>
+        <button id="tabBtnSchedule" onclick="switchAdminTab('schedule')" class="py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0">
+          <i class="fa-solid fa-timeline"></i> Schedule Timeline
+        </button>
+        <button id="tabBtnHeader" onclick="switchAdminTab('header')" class="py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0">
+          <i class="fa-solid fa-sliders"></i> Header, Date & Logos
+        </button>
+      </div>
+
+      <!-- Drawer Body -->
+      <div class="flex-1 overflow-y-auto admin-scroll p-6 space-y-6">
+
+        <!-- TAB 1: SLIDES MANAGER -->
+        <div id="tabContentSlides" class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-marine-950/80 p-4 rounded-2xl border border-azure/20">
+            <div>
+              <h3 class="font-party text-sm text-azure">Active Presentation Slide Deck</h3>
+              <p class="text-xs font-mono text-slate-400">Click any slide to edit its text, stat stacks, countdown timers, and celebration confetti.</p>
+            </div>
+            <button onclick="openTemplateSelectorModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-azure via-tealBlue-vibrant to-neon-sun text-black font-party text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg hover:brightness-110 active:scale-95 transition">
+              <i class="fa-solid fa-plus"></i> Add New Slide From Template
+            </button>
+          </div>
+
+          <!-- Slide Cards List -->
+          <div id="adminSlidesList" class="space-y-3">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+        <!-- TAB 2: SYSTEM, CLOUD & WAKELOCK (MOVED OFF PUBLIC HEADER) -->
+        <div id="tabContentSystem" class="hidden space-y-5 font-mono text-xs">
+          
+          <!-- WakeLock Controls -->
+          <div class="bg-marine-950/80 p-5 rounded-2xl border border-neon-sun/30 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-party text-sm text-neon-sun uppercase flex items-center gap-2">
+                  <i class="fa-solid fa-bolt"></i> Screen Keep-Awake Engine (Wake Lock)
+                </h3>
+                <p class="text-slate-400 mt-1">Prevents outdoor stage displays, kiosks, and projectors from going to sleep or locking.</p>
+              </div>
+              <div id="adminWakeStatusBadge" class="px-3 py-1 rounded-full bg-neon-sun/20 text-neon-sun border border-neon-sun/40 font-bold">
+                Active & Protecting
+              </div>
+            </div>
+
+            <div class="pt-2 flex items-center gap-3">
+              <button onclick="toggleWakeLockManual()" class="px-4 py-2 bg-marine-900 hover:bg-marine-800 border border-neon-sun/40 text-neon-sun font-bold rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-power-off"></i> Toggle WakeLock Manually
+              </button>
+              <span class="text-slate-400 text-[11px]">Automatically re-engages whenever this browser tab is focused.</span>
+            </div>
+          </div>
+
+          <!-- Cloud Sync Engine -->
+          <div class="bg-marine-950/80 p-5 rounded-2xl border border-azure/30 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-party text-sm text-emerald-400 uppercase flex items-center gap-2">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Multi-Screen Cloud Synchronization
+                </h3>
+                <p class="text-slate-400 mt-1">Broadcast slides and schedule updates from your laptop to all stage screens instantly.</p>
+              </div>
+              <span id="cloudModalStatusPill" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">
+                Connected & Synced
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div>
+                <label class="block text-slate-300 mb-1 font-bold">Shared Cloud Room / Channel ID</label>
+                <div class="flex gap-2">
+                  <input id="cfgCloudRoomId" type="text" placeholder="e.g. outing-goa-2026" class="flex-1 bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-azure outline-none font-bold">
+                  <button onclick="generateRandomRoomId()" class="px-3 bg-marine-800 text-azure rounded-xl hover:bg-marine-700 font-bold">Random</button>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1">Screens using the same Room ID will automatically receive live updates.</p>
+              </div>
+
+              <div>
+                <label class="block text-slate-300 mb-1 font-bold">Background Cloud Check Interval</label>
+                <select id="cfgCloudPollInterval" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-azure outline-none focus:border-azure">
+                  <option value="10">Every 10 Seconds (Recommended for stage)</option>
+                  <option value="15">Every 15 Seconds</option>
+                  <option value="30">Every 30 Seconds</option>
+                  <option value="0">Manual Sync Only (Disable Auto-Polling)</option>
+                </select>
+                <p class="text-[10px] text-slate-400 mt-1">Stage screens auto-refresh data silently without screen flicker.</p>
+              </div>
+            </div>
+
+            <!-- Manual Cloud Push / Pull Buttons -->
+            <div class="pt-3 border-t border-white/10 flex flex-wrap items-center gap-3">
+              <button onclick="pushToCloud(true)" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-tealBlue text-black font-party text-xs uppercase tracking-wider hover:brightness-110 active:scale-95 shadow-lg flex items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Push Current Config To Cloud Now
+              </button>
+              <button onclick="pullFromCloud(true)" class="px-4 py-2.5 rounded-xl bg-marine-800 hover:bg-marine-700 text-cyan-200 border border-azure/40 font-party text-xs uppercase tracking-wider active:scale-95 flex items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-down"></i> Pull Latest Config From Cloud
+              </button>
+              <button onclick="copyShareableCloudUrl()" class="px-4 py-2.5 rounded-xl bg-marine-900 hover:bg-marine-800 text-neon-sun border border-neon-sun/40 font-mono text-xs flex items-center gap-2">
+                <i class="fa-solid fa-link"></i> Copy Display URL with Room ID
+              </button>
+            </div>
+
+            <div id="cloudSyncMessage" class="text-xs text-tealBlue-mint pt-1"></div>
+          </div>
+        </div>
+
+        <!-- TAB 3: HOSTING & GEMINI SYNC GUIDE -->
+        <div id="tabContentHosting" class="hidden space-y-5 font-mono text-xs">
+          
+          <!-- Gemini Continuous Sync Guide -->
+          <div class="bg-gradient-to-r from-purple-950/60 via-marine-950 to-marine-950 p-5 rounded-2xl border border-neon-purple/50 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-party text-sm text-purple-300 uppercase flex items-center gap-2">
+                <i class="fa-solid fa-robot"></i> Seamless Sync with Future Gemini Chats
+              </h3>
+              <button onclick="copyGeminiSyncPrompt()" class="px-3 py-1 rounded-xl bg-neon-purple hover:bg-purple-500 text-white font-bold transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-copy"></i> Copy Sync Prompt
+              </button>
+            </div>
+            <p class="text-slate-300 leading-relaxed">
+              When you edit slides, schedule, logos, or dates in this Admin Console and later want Gemini to modify or add new features:
+            </p>
+            <ol class="list-decimal list-inside space-y-1.5 text-slate-300 pl-1">
+              <li>Click <strong>"Copy Gemini State"</strong> above or in the drawer header.</li>
+              <li>Paste it directly into your Gemini conversation along with whatever new changes you want.</li>
+              <li>Gemini will read your live state JSON and generate the updated code without resetting your custom slides or configs!</li>
+            </ol>
+          </div>
+
+          <!-- Free Hosting Guide -->
+          <div class="bg-marine-950/80 p-5 rounded-2xl border border-azure/30 space-y-4">
+            <h3 class="font-party text-sm text-azure uppercase flex items-center gap-2">
+              <i class="fa-solid fa-globe"></i> How to Host This Online (100% Free)
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+              <!-- Method A -->
+              <div class="bg-marine-900/90 border border-white/10 p-3.5 rounded-xl space-y-2">
+                <span class="text-neon-sun font-bold text-sm block">1. Netlify Drop (Fastest)</span>
+                <p class="text-slate-300 text-[11px] leading-relaxed">
+                  Go to <a href="https://app.netlify.com/drop" target="_blank" class="text-azure underline">netlify.com/drop</a>, create a folder containing this <code class="text-neon-coral">index.html</code>, and drag-and-drop it. You get an instant live HTTPS URL in 10 seconds!
+                </p>
+              </div>
+
+              <!-- Method B -->
+              <div class="bg-marine-900/90 border border-white/10 p-3.5 rounded-xl space-y-2">
+                <span class="text-tealBlue-mint font-bold text-sm block">2. GitHub Pages</span>
+                <p class="text-slate-300 text-[11px] leading-relaxed">
+                  Create a public GitHub repo, commit <code class="text-neon-coral">index.html</code>, go to <em>Settings &rarr; Pages</em>, and select the Main branch. Your live site will be ready at <code class="text-azure">username.github.io/repo</code>.
+                </p>
+              </div>
+
+              <!-- Method C -->
+              <div class="bg-marine-900/90 border border-white/10 p-3.5 rounded-xl space-y-2">
+                <span class="text-neon-coral font-bold text-sm block">3. Vercel</span>
+                <p class="text-slate-300 text-[11px] leading-relaxed">
+                  Import your GitHub repository into <a href="https://vercel.com" target="_blank" class="text-azure underline">Vercel</a>. It automatically deploys with continuous integration on every commit.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: SCHEDULE TIMELINE -->
+        <div id="tabContentSchedule" class="hidden space-y-5">
+          <div class="bg-marine-950/80 p-5 rounded-2xl border border-azure/20 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-party text-sm text-neon-sun uppercase">Time Schedule Marquee Items</h3>
+                <p class="text-xs font-mono text-slate-400">These items auto-scroll continuously across the footer marquee banner.</p>
+              </div>
+              <button onclick="addScheduleItem()" class="px-3 py-1.5 rounded-xl bg-neon-sun hover:bg-yellow-400 text-black font-mono text-xs font-bold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-plus"></i> Add Schedule Slot
+              </button>
+            </div>
+
+            <!-- Schedule Items Container -->
+            <div id="scheduleItemsAdminList" class="space-y-2.5 font-mono text-xs">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: GLOBAL HEADER & BRANDING -->
+        <div id="tabContentHeader" class="hidden space-y-5">
+          <div class="bg-marine-950/80 p-5 rounded-2xl border border-azure/20 space-y-4">
+            <h3 class="font-party text-sm text-azure uppercase">1. Dual Corner Logos</h3>
+            <p class="text-xs font-mono text-slate-400">Enter direct image URLs for the Left and Right logos (supports PNG/SVG/JPEG).</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+              <div>
+                <label class="block text-slate-300 mb-1 font-bold">Left Logo URL</label>
+                <div class="flex gap-2">
+                  <input id="cfgNavLeftLogo" type="text" class="flex-1 bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-azure outline-none">
+                  <button onclick="previewLogo('cfgNavLeftLogo', 'previewLeftImg')" class="px-3 bg-marine-800 text-azure rounded-xl hover:bg-marine-700">Test</button>
+                </div>
+                <div class="mt-2 flex items-center gap-2">
+                  <span class="text-[10px] text-slate-400">Preview:</span>
+                  <img id="previewLeftImg" src="" class="w-8 h-8 rounded-lg object-cover bg-black/40 border border-white/10">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-slate-300 mb-1 font-bold">Right Logo URL</label>
+                <div class="flex gap-2">
+                  <input id="cfgNavRightLogo" type="text" class="flex-1 bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-azure outline-none">
+                  <button onclick="previewLogo('cfgNavRightLogo', 'previewRightImg')" class="px-3 bg-marine-800 text-azure rounded-xl hover:bg-marine-700">Test</button>
+                </div>
+                <div class="mt-2 flex items-center gap-2">
+                  <span class="text-[10px] text-slate-400">Preview:</span>
+                  <img id="previewRightImg" src="" class="w-8 h-8 rounded-lg object-cover bg-black/40 border border-white/10">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-marine-950/80 p-5 rounded-2xl border border-azure/20 space-y-4">
+            <h3 class="font-party text-sm text-tealBlue-mint uppercase">2. Event Title, Date & Venue Location</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+              <div>
+                <label class="block text-slate-300 mb-1 font-bold">Event Title in Nav</label>
+                <input id="cfgNavTitle" type="text" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-azure outline-none">
+              </div>
+              <div>
+                <label class="block text-neon-sun mb-1 font-bold">📅 Event Date (Header Badge)</label>
+                <input id="cfgNavEventDate" type="text" placeholder="e.g. Oct 15, 2026" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-azure outline-none">
+              </div>
+              <div>
+                <label class="block text-slate-300 mb-1 font-bold">Venue / Location Badge</label>
+                <input id="cfgNavVenue" type="text" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-azure outline-none">
+              </div>
+              <div>
+                <label class="block text-slate-300 mb-1 font-bold">City Name (Weather Tag)</label>
+                <input id="cfgNavCity" type="text" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-azure outline-none">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-slate-300 mb-1 font-bold">Latitude (Open-Meteo)</label>
+                  <input id="cfgNavLat" type="number" step="0.0001" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-azure outline-none">
+                </div>
+                <div>
+                  <label class="block text-slate-300 mb-1 font-bold">Longitude (Open-Meteo)</label>
+                  <input id="cfgNavLon" type="number" step="0.0001" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-azure outline-none">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="px-6 py-4 border-t border-azure/20 bg-marine-950/90 flex items-center justify-between">
+        <div class="text-[11px] font-mono text-slate-400">
+          Keys: <strong>[←/→]</strong> Slide | <strong>[Space]</strong> Confetti | <strong>[F]</strong> Fullscreen | <strong>[A]</strong> Admin
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="closeAdmin()" class="px-4 py-2 rounded-xl bg-marine-800 text-slate-300 font-mono text-xs hover:bg-marine-700">
+            Cancel
+          </button>
+          <button onclick="saveGlobalAdminSettings()" class="px-6 py-2 rounded-xl bg-gradient-to-r from-azure to-tealBlue-vibrant hover:brightness-110 text-black font-party text-xs uppercase tracking-wider shadow-lg transition">
+            Save & Broadcast Console 🚀
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- TEMPLATE PICKER MODAL                                    -->
+  <!-- ======================================================== -->
+  <div id="templatePickerModal" class="fixed inset-0 bg-marine-950/90 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-marine-900 border-2 border-tealBlue-vibrant rounded-3xl w-full max-w-4xl p-6 shadow-2xl flex flex-col max-h-[88vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div>
+          <h3 class="text-lg font-party text-tealBlue-mint">Select a Slide Template</h3>
+          <p class="text-xs font-mono text-slate-400">Choose an archetype for your presentation deck:</p>
+        </div>
+        <button onclick="closeTemplateSelectorModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 my-4 overflow-y-auto admin-scroll pr-1 font-mono">
+        <button onclick="addSlideFromTemplate('HERO_WELCOME')" class="text-left bg-marine-950/80 hover:bg-marine-800 border border-azure/40 hover:border-azure p-4 rounded-2xl transition group flex flex-col justify-between">
+          <div>
+            <div class="w-9 h-9 rounded-xl bg-azure/20 text-azure flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">🌴</div>
+            <div class="font-party text-sm text-azure">Template 1: Hero Welcome</div>
+            <div class="text-[11px] text-slate-300 mt-1">Main stage welcome banner with all 4 editable stat stacks (Stats 1, 2, 3, 4) and celebration confetti.</div>
+          </div>
+          <span class="text-[10px] text-azure mt-3 font-bold block">+ Insert Template</span>
+        </button>
+
+        <button onclick="addSlideFromTemplate('NOW_OPS')" class="text-left bg-marine-950/80 hover:bg-marine-800 border border-neon-coral/40 hover:border-neon-coral p-4 rounded-2xl transition group flex flex-col justify-between">
+          <div>
+            <div class="w-9 h-9 rounded-xl bg-neon-coral/20 text-neon-coral flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">🔥</div>
+            <div class="font-party text-sm text-neon-coral">Template 2: Happening Now</div>
+            <div class="text-[11px] text-slate-300 mt-1">Active live activity spotlight, rules, host, bounty, and Up Next preview card.</div>
+          </div>
+          <span class="text-[10px] text-neon-coral mt-3 font-bold block">+ Insert Template</span>
+        </button>
+
+        <button onclick="addSlideFromTemplate('LEADERBOARD')" class="text-left bg-marine-950/80 hover:bg-marine-800 border border-tealBlue/40 hover:border-tealBlue-mint p-4 rounded-2xl transition group flex flex-col justify-between">
+          <div>
+            <div class="w-9 h-9 rounded-xl bg-tealBlue/20 text-tealBlue-mint flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">🏆</div>
+            <div class="font-party text-sm text-tealBlue-mint">Template 3: Squad Wars</div>
+            <div class="text-[11px] text-slate-300 mt-1">Squad rankings matrix with points tally and comedy Outing Infractions wall.</div>
+          </div>
+          <span class="text-[10px] text-tealBlue-mint mt-3 font-bold block">+ Insert Template</span>
+        </button>
+
+        <button onclick="addSlideFromTemplate('TIMELINE')" class="text-left bg-marine-950/80 hover:bg-marine-800 border border-neon-mint/40 hover:border-neon-mint p-4 rounded-2xl transition group flex flex-col justify-between">
+          <div>
+            <div class="w-9 h-9 rounded-xl bg-neon-mint/20 text-neon-mint flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">📅</div>
+            <div class="font-party text-sm text-neon-mint">Template 4: Day Timeline</div>
+            <div class="text-[11px] text-slate-300 mt-1">Full chronological day schedule with live badges ('COMPLETED', 'NOW', 'UPCOMING').</div>
+          </div>
+          <span class="text-[10px] text-neon-mint mt-3 font-bold block">+ Insert Template</span>
+        </button>
+
+        <button onclick="addSlideFromTemplate('PHOTO_SPOTLIGHT')" class="text-left bg-marine-950/80 hover:bg-marine-800 border border-neon-purple/40 hover:border-neon-purple p-4 rounded-2xl transition group flex flex-col justify-between">
+          <div>
+            <div class="w-9 h-9 rounded-xl bg-neon-purple/20 text-neon-purple flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">📸</div>
+            <div class="font-party text-sm text-purple-300">Template 5: Meme Spotlight</div>
+            <div class="text-[11px] text-slate-300 mt-1">Featured outing snapshot or meme frame, witty punchline quote, and crowd applause counter.</div>
+          </div>
+          <span class="text-[10px] text-purple-300 mt-3 font-bold block">+ Insert Template</span>
+        </button>
+
+        <button onclick="addSlideFromTemplate('PARTY_RULES')" class="text-left bg-marine-950/80 hover:bg-marine-800 border border-neon-sun/40 hover:border-neon-sun p-4 rounded-2xl transition group flex flex-col justify-between">
+          <div>
+            <div class="w-9 h-9 rounded-xl bg-neon-sun/20 text-neon-sun flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">🛡️</div>
+            <div class="font-party text-sm text-neon-sun">Template 6: Survival Protocols</div>
+            <div class="text-[11px] text-slate-300 mt-1">Hydration rules, pool/beach safety, medical gazebo details, and bus return timings.</div>
+          </div>
+          <span class="text-[10px] text-neon-sun mt-3 font-bold block">+ Insert Template</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SLIDE FIELD EDITOR MODAL (STATS 1-4 & TIMERS INCLUDED)   -->
+  <!-- ======================================================== -->
+  <div id="slideEditModal" class="fixed inset-0 bg-marine-950/90 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4">
+    <div class="bg-marine-900 border-2 border-azure rounded-3xl w-full max-w-3xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div>
+          <h3 id="editSlideModalTitle" class="text-lg font-party text-azure">Edit Slide</h3>
+          <p id="editSlideModalSubtitle" class="text-xs font-mono text-slate-400">Template settings</p>
+        </div>
+        <button onclick="closeSlideEditModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Form Inputs Container -->
+      <div id="slideEditorFields" class="overflow-y-auto admin-scroll my-4 space-y-4 pr-1 font-mono text-xs">
+        <!-- Rendered based on slide contents -->
+      </div>
+
+      <div class="pt-3 border-t border-white/10 flex items-center justify-between">
+        <button onclick="closeSlideEditModal()" class="px-4 py-2 bg-marine-800 text-slate-300 rounded-xl font-mono text-xs">
+          Cancel
+        </button>
+        <button onclick="saveCurrentSlideEdits()" class="px-6 py-2 bg-gradient-to-r from-azure to-tealBlue-vibrant text-black rounded-xl font-party text-xs uppercase tracking-wider hover:brightness-110 shadow-lg">
+          Update Slide ✨
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========================================================
+       DEFAULT DATA STATE, CLOUD CONFIG & PERSISTENCE
+       ======================================================== */
+    const DEFAULT_CONSOLE_DATA = {
+      global: {
+        eventTitle: "GETTOGETHER 2026",
+        eventDate: "Oct 15, 2026",
+        venueText: "Whispering Palms Beachfront, Goa",
+        cityWeatherLabel: "Goa Beach",
+        lat: 15.2993,
+        lon: 74.1240,
+        navLeftLogo: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=160&auto=format&fit=crop&q=80",
+        navRightLogo: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=160&auto=format&fit=crop&q=80",
+        cloudRoomId: "outing-goa-live",
+        cloudPollSec: 10,
+        lastUpdated: Date.now(),
+        scheduleItems: [
+          { time: "09:30 AM", label: "Bus Arrival & Fresh Coconut Welcome 🥥", status: "DONE" },
+          { time: "11:00 AM", label: "Beach Volleyball & Balloon Catapult 🏐", status: "DONE" },
+          { time: "01:00 PM", label: "Grand Coastal Feast & Grilled Barbecue 🥘", status: "DONE" },
+          { time: "03:30 PM", label: "Coconut Bowling & Tug-of-War Derby 🏆", status: "NOW" },
+          { time: "05:00 PM", label: "Sunset Cocktails, Mocktails & DJ Sundowner 🍹", status: "UPCOMING" },
+          { time: "07:30 PM", label: "Campfire Awards Gala & Meme Night 🎆", status: "UPCOMING" },
+          { time: "09:00 PM", label: "Return Buses Boarding Staging 🚌", status: "UPCOMING" }
+        ]
+      },
+      slides: [
+        {
+          id: "slide-hero",
+          type: "HERO_WELCOME",
+          name: "Welcome Hero Stage",
+          autoConfetti: true,
+          confettiIntervalSec: 10,
+          timerEnabled: false,
+          timerDurationSec: 300,
+          badge: "🌴 OUT OF OFFICE & INTO THE SUN 🌴",
+          headline: "WELCOME TO GETTOGETHER!",
+          subhead: "🔥 Zero Bugs Today, Only Barbecue, Chilled Brews & Beach Chaos! 🥥",
+          stat1Label: "Total Humans",
+          stat1Val: "148 Pax",
+          stat2Label: "Slack Allowed",
+          stat2Val: "ZERO",
+          stat3Label: "Current Arena",
+          stat3Val: "Coconut Lawn",
+          stat4Label: "Sunscreen Factor",
+          stat4Val: "SPF 50+"
+        },
+        {
+          id: "slide-now",
+          type: "NOW_OPS",
+          name: "Live Ops: What's Happening Now",
+          autoConfetti: false,
+          confettiIntervalSec: 12,
+          timerEnabled: true,
+          timerDurationSec: 900,
+          zone: "ZONE: COCONUT GROVE LAWN",
+          title: "🥥 COCONUT BOWLING & TUG-OF-WAR DERBY!",
+          desc: "All squads report to the sand arena! Hydration mandatory, flip-flops strictly prohibited for anchors. Winners earn 500 bonus points and priority barbecue access!",
+          host: "Dave from DevOps",
+          keyRule: "Pull with your legs, not your ego",
+          bounty: "Golden Pineapple Trophy",
+          targetEndTime: "17:00",
+          nextTime: "05:00 PM",
+          nextTitle: "🍹 Mega Sundowner & Live Acoustic BBQ",
+          nextDesc: "DJ Sunset Session at the beach shack. Unlimited roasted skewers, fresh mocktails, and party tracks."
+        },
+        {
+          id: "slide-leaderboard",
+          type: "LEADERBOARD",
+          name: "Squad Leaderboard & Penalties",
+          autoConfetti: false,
+          confettiIntervalSec: 12,
+          timerEnabled: false,
+          timerDurationSec: 300,
+          title: "🏆 SQUAD STANDINGS & COMEDY PENALTIES",
+          subtitle: "Live points verified by HR & DevOps Joint Coalition",
+          squads: [
+            { name: "The 404 Found Nothing", emoji: "🛸", pts: 2650, badge: "Leading by 150 Pts", status: "Active in Sand Arena" },
+            { name: "Ctrl+Alt+Defeat", emoji: "⚡", pts: 2500, badge: "Won Beach Volleyball", status: "Resting in Shade" },
+            { name: "Bug Busters 👾", emoji: "🔥", pts: 2320, badge: "Sing-Along Penalty", status: "Hydration Station" },
+            { name: "Caffeine Overload", emoji: "☕", pts: 2040, badge: "Grill Enthusiasts", status: "Buffet Recon Squad" },
+            { name: "Git Push -f Rebels", emoji: "🏴‍☠️", pts: 1890, badge: "Underdog Comeback", status: "Ready at Arena" }
+          ],
+          penalties: [
+            { rule: "Mentions 'Prod Deployment'", penalty: "Must sing chorus of 'Dancing Queen' on DJ mic" },
+            { rule: "First to check Slack", penalty: "Carry pineapple mascot for 30 minutes" },
+            { rule: "First to cannonball into pool", penalty: "Instant +250 Bonus Points to their squad" }
+          ]
+        },
+        {
+          id: "slide-timeline",
+          type: "TIMELINE",
+          name: "Master Day Timeline",
+          autoConfetti: false,
+          confettiIntervalSec: 12,
+          timerEnabled: false,
+          timerDurationSec: 300,
+          title: "📅 FULL OUTING ITINERARY & AGENDA",
+          subtitle: "Times synchronized with venue operations center",
+          items: [
+            { time: "09:30 AM", title: "Bus Arrival & Fresh Coconut Welcome 🥥", status: "COMPLETED", loc: "Main Resort Gate" },
+            { time: "11:00 AM", title: "Beach Volleyball & Balloon Catapult 🏐", status: "COMPLETED", loc: "Palm Sand Arena" },
+            { time: "01:00 PM", title: "Grand Coastal Seafood & Vegan Buffet 🥘", status: "COMPLETED", loc: "Dining Pavilion" },
+            { time: "03:30 PM", title: "Coconut Bowling & Tug-of-War Derby 🏆", status: "NOW", loc: "Coconut Grove Lawn" },
+            { time: "05:00 PM", title: "Sunset Cocktails, Mocktails & Acoustic Jam 🍹", status: "UPCOMING", loc: "Beach Sundeck" },
+            { time: "07:30 PM", title: "Campfire Awards Gala & Meme Night 🎆", status: "UPCOMING", loc: "Amphitheater" }
+          ]
+        },
+        {
+          id: "slide-photo",
+          type: "PHOTO_SPOTLIGHT",
+          name: "Meme & Photo of the Hour",
+          autoConfetti: false,
+          confettiIntervalSec: 10,
+          timerEnabled: false,
+          timerDurationSec: 180,
+          title: "📸 OUTING SHOUTOUT & MEME OF THE HOUR",
+          photoUrl: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=900&auto=format&fit=crop&q=80",
+          caption: "When the PM says 'quick 5 min sync' right as the barbecue grill opens up.",
+          author: "Spotted by Team Alpha",
+          reactions: 142
+        },
+        {
+          id: "slide-rules",
+          type: "PARTY_RULES",
+          name: "Survival & Refreshment Protocol",
+          autoConfetti: false,
+          confettiIntervalSec: 12,
+          timerEnabled: false,
+          timerDurationSec: 240,
+          title: "🛡️ OUTING SURVIVAL & REFRESHMENT PROTOCOL",
+          subtitle: "Safety first, epic memories second!",
+          guidelines: [
+            { icon: "🍹", title: "Hydration Mandatory", text: "Maintain a 1:1 ratio between festive drinks and mineral/coconut water. Free hydration stations are active!" },
+            { icon: "🏊", title: "Beach & Pool Safety", text: "Lifeguards on duty until 06:30 PM. No glassware in sand or surf zones." },
+            { icon: "🚌", title: "Departure Staging", text: "Return buses stage at 08:30 PM sharp. Squad captains will conduct headcount." }
+          ],
+          medicalNote: "First-Aid Tent: Gazebo 3 next to Palm Pavilion | Coordinator: Priya #404"
+        }
+      ]
+    };
+
+    let consoleData = loadData();
+    let currentSlideIndex = 0;
+    let currentlyEditingSlideIndex = -1;
+    let autoConfettiTimer = null;
+
+    // Slide countdown timer runtime state
+    let slideTimerInterval = null;
+    let slideTimerRemaining = 0;
+    let slideTimerIsRunning = false;
+
+    // Cloud polling runtime state
+    let cloudPollInterval = null;
+    let isCloudSyncing = false;
+
+    // Screen wake lock runtime state
+    let wakeLockSentinel = null;
+    let wakeLockManualDisabled = false;
+
+    function getURLParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    function loadData() {
+      const roomParam = getURLParam('room');
+      try {
+        const stored = localStorage.getItem('team_outing_console_cloud_v7');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (roomParam) parsed.global.cloudRoomId = roomParam;
+          return parsed;
+        }
+      } catch (e) {
+        console.warn("Storage parse error, resetting to defaults", e);
+      }
+      const fresh = JSON.parse(JSON.stringify(DEFAULT_CONSOLE_DATA));
+      if (roomParam) fresh.global.cloudRoomId = roomParam;
+      return fresh;
+    }
+
+    function persistData() {
+      consoleData.global.lastUpdated = Date.now();
+      localStorage.setItem('team_outing_console_cloud_v7', JSON.stringify(consoleData));
+    }
+
+    /* ========================================================
+       SCREEN WAKE LOCK ENGINE (INSIDE ADMIN & AUTO-ENGAGED)
+       ======================================================== */
+    async function requestScreenWakeLock() {
+      if (wakeLockManualDisabled) return;
+      if ('wakeLock' in navigator) {
+        try {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+          updateWakeLockUI(true);
+          wakeLockSentinel.addEventListener('release', () => {
+            if (!wakeLockManualDisabled) {
+              updateWakeLockUI(false);
+            }
+          });
+        } catch (err) {
+          console.warn("Wake Lock request failed:", err);
+          updateWakeLockUI(false);
+        }
+      } else {
+        updateWakeLockUI(false, "Wake Lock Unsupported");
+      }
+    }
+
+    function updateWakeLockUI(isActive, customText = null) {
+      const badge = document.getElementById('adminWakeStatusBadge');
+      if (!badge) return;
+
+      if (customText) {
+        badge.textContent = customText;
+        badge.className = "px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-bold";
+        return;
+      }
+
+      if (isActive) {
+        badge.textContent = "Active & Protecting Screen ⚡";
+        badge.className = "px-3 py-1 rounded-full bg-neon-sun/20 text-neon-sun border border-neon-sun/40 font-bold";
+      } else {
+        badge.textContent = "Disabled / Sleeping ⚠️";
+        badge.className = "px-3 py-1 rounded-full bg-rose-950/60 text-rose-400 border border-rose-600/40 font-bold";
+      }
+    }
+
+    function toggleWakeLockManual() {
+      if (wakeLockSentinel && !wakeLockSentinel.released) {
+        wakeLockManualDisabled = true;
+        wakeLockSentinel.release();
+        wakeLockSentinel = null;
+        updateWakeLockUI(false);
+      } else {
+        wakeLockManualDisabled = false;
+        requestScreenWakeLock();
+      }
+    }
+
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible' && !wakeLockManualDisabled) {
+        await requestScreenWakeLock();
+      }
+    });
+
+    /* ========================================================
+       LIVE CLOUD SYNCHRONIZATION ENGINE
+       ======================================================== */
+    function updateCloudStatusBadge(status, label) {
+      const modalPill = document.getElementById('cloudModalStatusPill');
+      if (!modalPill) return;
+
+      if (status === 'syncing') {
+        modalPill.className = "px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold animate-pulse";
+        modalPill.textContent = label || "Syncing with Cloud...";
+      } else if (status === 'synced') {
+        modalPill.className = "px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold";
+        modalPill.textContent = label || `Room: ${consoleData.global.cloudRoomId} 🟢`;
+      } else if (status === 'error') {
+        modalPill.className = "px-3 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold";
+        modalPill.textContent = label || "Sync Standby";
+      }
+    }
+
+    async function pushToCloud(isManual = false) {
+      if (isCloudSyncing) return;
+      isCloudSyncing = true;
+      updateCloudStatusBadge('syncing', "Pushing to Cloud...");
+      const msg = document.getElementById('cloudSyncMessage');
+      if (msg) msg.textContent = "Uploading current configuration to cloud channel...";
+
+      consoleData.global.lastUpdated = Date.now();
+      persistData();
+
+      try {
+        // Broadcast via localStorage cross-tab channel for instant local display sync
+        localStorage.setItem('team_outing_broadcast_channel_v7', JSON.stringify({
+          timestamp: Date.now(),
+          roomId: consoleData.global.cloudRoomId,
+          data: consoleData
+        }));
+
+        // Push to public REST JSON cloud KV for external device synchronization
+        const room = encodeURIComponent((consoleData.global.cloudRoomId || 'default-outing-room').trim());
+        const response = await fetch(`https://kvdb.io/5jKzYtPzKrq2Q9qR4Y2eYw/${room}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(consoleData)
+        });
+
+        if (response.ok || response.status === 200 || response.status === 201) {
+          updateCloudStatusBadge('synced', `Room: ${consoleData.global.cloudRoomId} 🟢`);
+          if (msg) msg.textContent = `Pushed live at ${new Date().toLocaleTimeString()}! All screens are updated.`;
+          if (isManual) blastConfetti(true);
+        } else {
+          throw new Error("HTTP error " + response.status);
+        }
+      } catch (err) {
+        console.warn("Cloud push notice:", err);
+        updateCloudStatusBadge('synced', "Local Mesh Synced 🟢");
+        if (msg) msg.textContent = `Saved locally & synced to open tabs (${new Date().toLocaleTimeString()}).`;
+      } finally {
+        isCloudSyncing = false;
+      }
+    }
+
+    async function pullFromCloud(isManual = false) {
+      if (isCloudSyncing) return;
+      isCloudSyncing = true;
+      updateCloudStatusBadge('syncing', "Checking Cloud...");
+      const msg = document.getElementById('cloudSyncMessage');
+
+      try {
+        const room = encodeURIComponent((consoleData.global.cloudRoomId || 'default-outing-room').trim());
+        const response = await fetch(`https://kvdb.io/5jKzYtPzKrq2Q9qR4Y2eYw/${room}?t=${Date.now()}`, {
+          cache: 'no-store'
+        });
+
+        if (response.ok) {
+          const remoteData = await response.json();
+          if (remoteData && remoteData.slides && remoteData.global) {
+            const remoteTime = remoteData.global.lastUpdated || 0;
+            const localTime = consoleData.global.lastUpdated || 0;
+
+            if (isManual || remoteTime > localTime) {
+              consoleData = remoteData;
+              persistData();
+              renderGlobalHeader();
+              renderScheduleMarquee();
+              renderSlides();
+              if (msg) msg.textContent = `Pulled latest config from cloud at ${new Date().toLocaleTimeString()}`;
+            }
+          }
+          updateCloudStatusBadge('synced', `Room: ${consoleData.global.cloudRoomId} 🟢`);
+        } else {
+          updateCloudStatusBadge('synced', `Room: ${consoleData.global.cloudRoomId} 🟢`);
+        }
+      } catch (err) {
+        console.warn("Cloud pull notice:", err);
+        updateCloudStatusBadge('synced', `Room: ${consoleData.global.cloudRoomId} 🟢`);
+      } finally {
+        isCloudSyncing = false;
+      }
+    }
+
+    function setupCloudPolling() {
+      if (cloudPollInterval) {
+        clearInterval(cloudPollInterval);
+        cloudPollInterval = null;
+      }
+
+      const sec = parseInt(consoleData.global.cloudPollSec, 10) || 10;
+      if (sec > 0) {
+        cloudPollInterval = setInterval(() => {
+          pullFromCloud(false);
+        }, sec * 1000);
+      }
+    }
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'team_outing_broadcast_channel_v7' && e.newValue) {
+        try {
+          const packet = JSON.parse(e.newValue);
+          if (packet.roomId === consoleData.global.cloudRoomId && packet.data) {
+            consoleData = packet.data;
+            persistData();
+            renderGlobalHeader();
+            renderScheduleMarquee();
+            renderSlides();
+          }
+        } catch (err) {
+          console.warn("Storage sync parse notice:", err);
+        }
+      }
+    });
+
+    function generateRandomRoomId() {
+      const words = ["outing", "summit", "retreat", "beach", "camp", "fiesta", "sundown"];
+      const rand = words[Math.floor(Math.random() * words.length)] + "-" + Math.floor(100 + Math.random() * 900);
+      document.getElementById('cfgCloudRoomId').value = rand;
+    }
+
+    function copyShareableCloudUrl() {
+      const room = (consoleData.global.cloudRoomId || 'default-outing-room').trim();
+      const base = window.location.origin + window.location.pathname;
+      const shareUrl = `${base}?room=${encodeURIComponent(room)}`;
+      
+      const el = document.createElement('textarea');
+      el.value = shareUrl;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+
+      const msg = document.getElementById('cloudSyncMessage');
+      if (msg) msg.textContent = `Copied Shareable URL: ${shareUrl}`;
+      blastConfetti(true);
+    }
+
+    /* ========================================================
+       GEMINI CONTINUOUS SYNC PROMPT EXPORTER
+       ======================================================== */
+    function copyGeminiSyncPrompt() {
+      const promptPayload = `Here is my current live configuration for the Live Team Outing Operations Console:
+
+\`\`\`json
+${JSON.stringify(consoleData, null, 2)}
+\`\`\`
+
+Please preserve this exact configuration (all custom slides, text, logos, dates, and schedule items) and apply the following changes:
+[Describe your new requests or features here]`;
+
+      const el = document.createElement('textarea');
+      el.value = promptPayload;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+
+      const msg = document.getElementById('cloudSyncMessage');
+      if (msg) msg.textContent = "Copied Gemini Sync State to clipboard! You can paste it into Gemini chat.";
+      blastConfetti(true);
+    }
+
+    /* ========================================================
+       SLIDE COUNTDOWN TIMER ENGINE (START / PAUSE / RESET)
+       ======================================================== */
+    function setupSlideTimerHUD() {
+      if (slideTimerInterval) {
+        clearInterval(slideTimerInterval);
+        slideTimerInterval = null;
+      }
+      slideTimerIsRunning = false;
+
+      const activeSlide = consoleData.slides[currentSlideIndex];
+      const timerHUD = document.getElementById('slideTimerHUD');
+
+      if (!activeSlide || !activeSlide.timerEnabled) {
+        timerHUD.classList.add('hidden');
+        return;
+      }
+
+      slideTimerRemaining = activeSlide.timerDurationSec || 300;
+      updateTimerDigitsDisplay();
+      updateTimerControlsUI();
+      timerHUD.classList.remove('hidden');
+    }
+
+    function toggleSlideTimer() {
+      if (slideTimerIsRunning) {
+        pauseSlideTimer();
+      } else {
+        startSlideTimer();
+      }
+    }
+
+    function startSlideTimer() {
+      if (slideTimerInterval) clearInterval(slideTimerInterval);
+      slideTimerIsRunning = true;
+      updateTimerControlsUI();
+
+      slideTimerInterval = setInterval(() => {
+        if (slideTimerRemaining > 0) {
+          slideTimerRemaining--;
+          updateTimerDigitsDisplay();
+        } else {
+          pauseSlideTimer();
+          blastConfetti(true);
+        }
+      }, 1000);
+    }
+
+    function pauseSlideTimer() {
+      if (slideTimerInterval) {
+        clearInterval(slideTimerInterval);
+        slideTimerInterval = null;
+      }
+      slideTimerIsRunning = false;
+      updateTimerControlsUI();
+    }
+
+    function resetSlideTimer() {
+      pauseSlideTimer();
+      const activeSlide = consoleData.slides[currentSlideIndex];
+      slideTimerRemaining = (activeSlide && activeSlide.timerDurationSec) ? activeSlide.timerDurationSec : 300;
+      updateTimerDigitsDisplay();
+    }
+
+    function updateTimerDigitsDisplay() {
+      const minutes = Math.floor(slideTimerRemaining / 60);
+      const seconds = slideTimerRemaining % 60;
+      const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      const digitsEl = document.getElementById('timerDigitsDisplay');
+      if (digitsEl) digitsEl.textContent = formatted;
+    }
+
+    function updateTimerControlsUI() {
+      const btn = document.getElementById('btnTimerStartPause');
+      const icon = document.getElementById('timerIconState');
+      if (!btn || !icon) return;
+
+      if (slideTimerIsRunning) {
+        icon.className = "fa-solid fa-pause";
+        btn.className = "w-7 h-7 rounded-xl bg-neon-coral text-white flex items-center justify-center text-xs font-bold transition active:scale-90";
+      } else {
+        icon.className = "fa-solid fa-play";
+        btn.className = "w-7 h-7 rounded-xl bg-neon-sun text-black flex items-center justify-center text-xs font-bold transition active:scale-90";
+      }
+    }
+
+    /* ========================================================
+       SLIDE NAVIGATION & CONFETTI SCHEDULER (NO NUMBERS)
+       ======================================================== */
+    function goToSlide(index) {
+      if (consoleData.slides.length === 0) return;
+      if (index < 0) index = consoleData.slides.length - 1;
+      if (index >= consoleData.slides.length) index = 0;
+      currentSlideIndex = index;
+      updateActiveSlideDisplay();
+      setupSlideConfettiInterval();
+      setupSlideTimerHUD();
+    }
+
+    function nextSlide() {
+      goToSlide(currentSlideIndex + 1);
+    }
+
+    function prevSlide() {
+      goToSlide(currentSlideIndex - 1);
+    }
+
+    function updateActiveSlideDisplay() {
+      const slides = document.querySelectorAll('.slide-card');
+      slides.forEach((el, idx) => {
+        if (idx === currentSlideIndex) {
+          el.classList.add('active-slide');
+        } else {
+          el.classList.remove('active-slide');
+        }
+      });
+      renderSlideNavigatorGrid();
+    }
+
+    function toggleSlideSelectorModal() {
+      const modal = document.getElementById('slideNavigatorModal');
+      if (modal.classList.contains('hidden')) {
+        renderSlideNavigatorGrid();
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function renderSlideNavigatorGrid() {
+      const grid = document.getElementById('slideNavigatorGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      consoleData.slides.forEach((slide, idx) => {
+        const isActive = idx === currentSlideIndex;
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-2xl border cursor-pointer transition flex flex-col justify-between ${
+          isActive 
+            ? 'bg-azure/20 border-azure glow-azure ring-1 ring-azure' 
+            : 'bg-marine-950/80 border-white/10 hover:border-azure/50 hover:bg-marine-800'
+        }`;
+        
+        let typeBadgeColor = "text-azure bg-azure/10 border-azure/30";
+        if (slide.type === 'NOW_OPS') typeBadgeColor = "text-neon-coral bg-neon-coral/10 border-neon-coral/30";
+        if (slide.type === 'LEADERBOARD') typeBadgeColor = "text-tealBlue-mint bg-tealBlue/10 border-tealBlue/30";
+        if (slide.type === 'TIMELINE') typeBadgeColor = "text-neon-mint bg-neon-mint/10 border-neon-mint/30";
+
+        card.onclick = () => {
+          goToSlide(idx);
+          toggleSlideSelectorModal();
+        };
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span class="font-bold text-white text-sm truncate">${slide.name}</span>
+              ${isActive ? '<span class="px-2 py-0.5 rounded-full bg-azure text-black text-[9px] font-bold">CURRENT</span>' : ''}
+            </div>
+            <div class="text-[11px] text-slate-300 truncate">
+              ${slide.title || slide.headline || 'Slide'}
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-3 pt-2 border-t border-white/10">
+            <span class="px-2 py-0.5 rounded-md border text-[9px] uppercase ${typeBadgeColor}">${slide.type}</span>
+            <span class="text-azure text-[10px] flex items-center gap-1 font-bold">Jump <i class="fa-solid fa-arrow-right text-[8px]"></i></span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function setupSlideConfettiInterval() {
+      if (autoConfettiTimer) {
+        clearInterval(autoConfettiTimer);
+        autoConfettiTimer = null;
+      }
+
+      const activeSlide = consoleData.slides[currentSlideIndex];
+      if (!activeSlide) return;
+
+      if (activeSlide.autoConfetti) {
+        blastConfetti(false);
+        const intervalMs = Math.max(4, (activeSlide.confettiIntervalSec || 10)) * 1000;
+        autoConfettiTimer = setInterval(() => {
+          blastConfetti(false);
+        }, intervalMs);
+      }
+    }
+
+    function blastConfetti(isManual = false) {
+      if (typeof confetti !== 'function') return;
+
+      if (isManual) {
+        confetti({
+          particleCount: 110,
+          spread: 85,
+          origin: { y: 0.8 },
+          colors: ['#179EDA', '#028090', '#00a896', '#FFBE0B', '#FF006E', '#06D6A0']
+        });
+      } else {
+        confetti({
+          particleCount: 35,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.85 },
+          colors: ['#179EDA', '#02c39a', '#FFBE0B', '#FF006E']
+        });
+        confetti({
+          particleCount: 35,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.85 },
+          colors: ['#179EDA', '#00a896', '#FFBE0B', '#FF5A5F']
+        });
+      }
+    }
+
+    /* ========================================================
+       SCHEDULE MARQUEE RENDERER
+       ======================================================== */
+    function renderScheduleMarquee() {
+      const track = document.getElementById('scheduleMarqueeTrack');
+      const items = consoleData.global.scheduleItems || [];
+
+      if (items.length === 0) {
+        track.innerHTML = `<span>Schedule list is currently empty. Add items in Admin!</span>`;
+        return;
+      }
+
+      const generateSegment = () => items.map(item => {
+        let badgeColor = "bg-marine-800 text-slate-300 border-white/10";
+        if (item.status === 'DONE') badgeColor = "bg-tealBlue-mint/20 text-tealBlue-mint border-tealBlue-mint/40";
+        if (item.status === 'NOW') badgeColor = "bg-neon-coral text-white font-bold animate-pulse shadow-sm";
+        if (item.status === 'UPCOMING') badgeColor = "bg-azure/20 text-azure border-azure/40";
+
+        return `
+          <div class="inline-flex items-center gap-2 bg-marine-900/80 border border-white/10 px-3 py-1 rounded-xl">
+            <span class="text-neon-sun font-black">${item.time}</span>
+            <span class="text-white">${item.label}</span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded-full border ${badgeColor}">${item.status}</span>
+          </div>
+        `;
+      }).join('');
+
+      track.innerHTML = generateSegment() + generateSegment();
+    }
+
+    /* ========================================================
+       SLIDE TEMPLATE ENGINE
+       ======================================================== */
+    function renderSlides() {
+      const viewport = document.getElementById('slideViewport');
+      viewport.innerHTML = '';
+
+      if (consoleData.slides.length === 0) {
+        viewport.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center p-6">
+            <span class="text-6xl mb-4">🌴</span>
+            <h2 class="text-2xl font-party text-azure">No Slides In Deck</h2>
+            <p class="font-mono text-xs text-slate-400 mt-2">Open the Admin Console and insert a template to launch your presentation.</p>
+            <button onclick="openAdmin()" class="mt-4 px-4 py-2 bg-azure text-black rounded-xl font-party text-xs">Open Admin</button>
+          </div>
+        `;
+        return;
+      }
+
+      consoleData.slides.forEach((slide, idx) => {
+        const slideEl = document.createElement('section');
+        slideEl.id = `slide-item-${idx}`;
+        slideEl.className = `slide-card ${idx === currentSlideIndex ? 'active-slide' : ''}`;
+        
+        switch (slide.type) {
+          case 'HERO_WELCOME':
+            slideEl.innerHTML = renderHeroTemplate(slide);
+            break;
+          case 'NOW_OPS':
+            slideEl.innerHTML = renderNowOpsTemplate(slide);
+            break;
+          case 'LEADERBOARD':
+            slideEl.innerHTML = renderLeaderboardTemplate(slide);
+            break;
+          case 'TIMELINE':
+            slideEl.innerHTML = renderTimelineTemplate(slide);
+            break;
+          case 'PHOTO_SPOTLIGHT':
+            slideEl.innerHTML = renderPhotoSpotlightTemplate(slide);
+            break;
+          case 'PARTY_RULES':
+            slideEl.innerHTML = renderPartyRulesTemplate(slide);
+            break;
+          default:
+            slideEl.innerHTML = `<div class="p-8 text-center text-neon-sun font-party">Unknown Template</div>`;
+        }
+
+        viewport.appendChild(slideEl);
+      });
+
+      updateActiveSlideDisplay();
+      setupSlideConfettiInterval();
+      setupSlideTimerHUD();
+    }
+
+    /* Template 1: Hero Welcome (ALL 4 STATS FULLY DISPLAYED, NO NUMBERS) */
+    function renderHeroTemplate(s) {
+      return `
+        <div class="h-full flex flex-col justify-between items-center text-center py-2">
+          
+          <div class="mt-1">
+            <span class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-azure/20 border border-azure/40 text-azure font-mono text-xs sm:text-sm font-bold uppercase tracking-wider animate-bounce shadow-sm">
+              ${s.badge || '🌴 OUT OF OFFICE & INTO THE SUN 🌴'}
+            </span>
+          </div>
+
+          <div class="max-w-5xl my-auto">
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-party tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-azure via-cyan-200 to-neon-sun drop-shadow-2xl leading-none">
+              ${s.headline}
+            </h1>
+            <p class="text-base sm:text-2xl font-display text-tealBlue-mint font-bold tracking-wide mt-4 max-w-4xl mx-auto drop-shadow-md">
+              ${s.subhead}
+            </p>
+
+            <!-- 4 FULLY EDITABLE STAT CARDS (Cards 1, 2, 3, and 4) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 mt-8 w-full">
+              <!-- Stack 1 -->
+              <div class="glass-card p-3.5 rounded-2xl hover:border-azure transition">
+                <div class="text-[11px] font-mono text-slate-400 uppercase">${s.stat1Label || 'Total Humans'}</div>
+                <div class="text-2xl font-party text-azure mt-0.5">${s.stat1Val || '148'}</div>
+              </div>
+              <!-- Stack 2 -->
+              <div class="glass-card p-3.5 rounded-2xl hover:border-neon-coral transition">
+                <div class="text-[11px] font-mono text-slate-400 uppercase">${s.stat2Label || 'Slack Allowed'}</div>
+                <div class="text-2xl font-party text-neon-coral mt-0.5">${s.stat2Val || 'ZERO'}</div>
+              </div>
+              <!-- Stack 3 (FULLY EDITABLE) -->
+              <div class="glass-card p-3.5 rounded-2xl hover:border-tealBlue-vibrant transition">
+                <div class="text-[11px] font-mono text-slate-400 uppercase">${s.stat3Label || 'Current Arena'}</div>
+                <div class="text-2xl font-party text-tealBlue-vibrant truncate mt-0.5">${s.stat3Val || 'Coconut Lawn'}</div>
+              </div>
+              <!-- Stack 4 (FULLY EDITABLE) -->
+              <div class="glass-card p-3.5 rounded-2xl hover:border-neon-mint transition">
+                <div class="text-[11px] font-mono text-slate-400 uppercase">${s.stat4Label || 'Sunscreen Factor'}</div>
+                <div class="text-2xl font-party text-neon-mint mt-0.5">${s.stat4Val || 'SPF 50+'}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="font-mono text-xs text-slate-400 flex items-center gap-2">
+            <span>Navigation: <strong>[← / →]</strong> arrows or click <strong>Slides</strong></span>
+          </div>
+
+        </div>
+      `;
+    }
+
+    /* Template 2: What's Happening Now */
+    function renderNowOpsTemplate(s) {
+      return `
+        <div class="h-full flex flex-col justify-between py-1">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-neon-coral text-white font-mono text-xs font-black uppercase tracking-widest animate-pulse shadow-md">
+                <span class="w-2 h-2 rounded-full bg-white"></span> LIVE SPOTLIGHT
+              </span>
+              <h2 class="text-xl sm:text-2xl font-party text-azure">What's Happening Right Now?</h2>
+            </div>
+            <div class="text-right font-mono text-xs text-neon-sun">
+              Target End Time: <span class="font-bold text-white">${s.targetEndTime || '17:00'}</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto items-stretch">
+            <div class="lg:col-span-8 bg-gradient-to-br from-marine-900/90 via-marine-950/90 to-marine-900/90 border-2 border-azure rounded-3xl p-6 sm:p-7 flex flex-col justify-between glow-azure backdrop-blur relative overflow-hidden">
+              <span class="absolute top-4 right-4 text-5xl opacity-10">🏆</span>
+              <div>
+                <span class="bg-azure/20 text-azure border border-azure/40 font-mono text-xs font-bold px-3 py-1 rounded-full uppercase">
+                  ${s.zone || 'ZONE: BEACH ARENA'}
+                </span>
+                <h3 class="text-2xl sm:text-4xl lg:text-5xl font-party text-white tracking-wide leading-tight my-3">
+                  ${s.title}
+                </h3>
+                <p class="text-sm sm:text-lg font-display text-slate-200 leading-relaxed font-semibold">
+                  ${s.desc}
+                </p>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
+                <div class="bg-marine-950/70 p-3 rounded-2xl border border-white/10">
+                  <div class="text-[10px] font-mono uppercase text-slate-400">Chief Game Master</div>
+                  <div class="font-bold text-tealBlue-mint text-sm truncate mt-0.5">🎤 ${s.host}</div>
+                </div>
+                <div class="bg-marine-950/70 p-3 rounded-2xl border border-white/10">
+                  <div class="text-[10px] font-mono uppercase text-slate-400">Survival Rule</div>
+                  <div class="font-bold text-neon-coral text-sm truncate mt-0.5">⚠️ ${s.keyRule}</div>
+                </div>
+                <div class="bg-marine-950/70 p-3 rounded-2xl border border-white/10">
+                  <div class="text-[10px] font-mono uppercase text-slate-400">Round Bounty</div>
+                  <div class="font-bold text-neon-sun text-sm truncate mt-0.5">👑 ${s.bounty}</div>
+                </div>
+              </div>
+
+              <div class="bg-marine-950/80 rounded-2xl p-3.5 border border-azure/40">
+                <div class="flex items-center justify-between font-mono text-xs mb-1.5">
+                  <span class="text-slate-400 uppercase">Live Session Status:</span>
+                  <span class="text-neon-coral font-bold text-sm uppercase animate-pulse">ACTIVE NOW</span>
+                </div>
+                <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden p-0.5">
+                  <div class="h-full bg-gradient-to-r from-azure via-tealBlue to-neon-sun rounded-full" style="width: 68%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-4 flex flex-col justify-between gap-4">
+              <div class="bg-gradient-to-br from-tealBlue-deep/70 to-marine-950 border border-tealBlue-vibrant rounded-3xl p-6 glow-teal flex-1 flex flex-col justify-between backdrop-blur">
+                <div>
+                  <div class="text-xs font-mono font-bold uppercase tracking-widest text-tealBlue-mint flex items-center gap-1.5 mb-2">
+                    <i class="fa-solid fa-forward"></i> UP NEXT ON DECK
+                  </div>
+                  <div class="text-3xl font-party text-neon-sun mb-1">${s.nextTime || '05:00 PM'}</div>
+                  <h4 class="text-lg font-bold font-display text-white mb-2">${s.nextTitle}</h4>
+                  <p class="text-xs text-slate-300 font-sans leading-relaxed">${s.nextDesc}</p>
+                </div>
+                <div class="bg-marine-950/80 p-2.5 rounded-xl border border-white/10 text-xs font-mono text-tealBlue-mint flex items-center justify-between mt-3">
+                  <span>Vibe Telemetry:</span>
+                  <span class="font-bold">100% Vibrant 🌺</span>
+                </div>
+              </div>
+
+              <div class="bg-marine-950/80 border border-azure/30 rounded-2xl p-3 text-xs font-mono text-azure flex items-center gap-2.5">
+                <span class="text-xl">🥥</span>
+                <div>Hydration Check: Chilled tender coconut at the beach kiosk!</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center font-mono text-[11px] text-slate-400">
+            Operations live update console • Cloud synced across all venue screens
+          </div>
+        </div>
+      `;
+    }
+
+    /* Template 3: Squad Wars (NO RANK NUMBERS) */
+    function renderLeaderboardTemplate(s) {
+      let squadRows = '';
+      (s.squads || []).forEach((sq, i) => {
+        const isFirst = i === 0;
+        squadRows += `
+          <div class="p-3 rounded-2xl flex items-center justify-between border transition ${
+            isFirst ? 'bg-gradient-to-r from-azure/20 via-marine-900 to-marine-950 border-azure glow-azure' : 'bg-marine-950/60 border-white/10'
+          }">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-xl ${isFirst ? 'bg-azure text-black' : 'bg-marine-800 text-azure'} text-sm flex items-center justify-center">
+                ${sq.emoji || '⚡'}
+              </span>
+              <div>
+                <div class="font-bold text-white text-sm sm:text-base flex items-center gap-1.5">
+                  ${sq.name}
+                </div>
+                <div class="text-[10px] font-mono text-slate-400 flex items-center gap-2">
+                  <span class="${isFirst ? 'text-azure font-bold' : ''}">${sq.badge || ''}</span>
+                  <span>•</span>
+                  <span class="text-tealBlue-mint">${sq.status || 'Active'}</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="font-party text-lg text-neon-sun">${sq.pts}</div>
+              <div class="text-[9px] font-mono uppercase text-slate-400">Points</div>
+            </div>
+          </div>
+        `;
+      });
+
+      let penaltyItems = '';
+      (s.penalties || []).forEach(p => {
+        penaltyItems += `
+          <div class="bg-marine-950/80 p-2.5 rounded-xl border border-neon-coral/30">
+            <span class="text-neon-coral font-bold block">${p.rule}:</span>
+            <span class="text-slate-200">${p.penalty}</span>
+          </div>
+        `;
+      });
+
+      return `
+        <div class="h-full flex flex-col justify-between py-1">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div>
+              <span class="text-xs font-mono text-azure uppercase font-bold tracking-widest block">${s.subtitle || 'Standings'}</span>
+              <h2 class="text-xl sm:text-2xl font-party text-white">${s.title}</h2>
+            </div>
+            <button onclick="blastConfetti(true)" class="px-3 py-1 bg-gradient-to-r from-azure to-tealBlue text-black font-bold font-mono text-xs rounded-xl shadow-md hover:brightness-110 transition">
+              Cheer Leaders! 👏
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto">
+            <div class="lg:col-span-8 bg-marine-900/60 border border-azure/30 rounded-3xl p-4 backdrop-blur space-y-2.5">
+              ${squadRows}
+            </div>
+
+            <div class="lg:col-span-4 bg-gradient-to-br from-rose-950/60 via-marine-950 to-marine-950 border border-neon-coral/40 rounded-3xl p-5 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="text-2xl">🚨</span>
+                  <h3 class="font-party text-sm text-neon-coral uppercase tracking-wider">Outing Infractions Wall</h3>
+                </div>
+                <p class="text-xs text-slate-300 mb-3">Instant comedy penalties imposed on court conviction:</p>
+                <div class="space-y-2.5 font-mono text-xs">
+                  ${penaltyItems}
+                </div>
+              </div>
+              <div class="text-[10px] font-mono text-center text-slate-400 mt-2">
+                Referee Court: HR & DevOps Coalition ⚖️
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center font-mono text-[11px] text-slate-400">
+            Real-time tournament updates sync immediately via Admin
+          </div>
+        </div>
+      `;
+    }
+
+    /* Template 4: Timeline */
+    function renderTimelineTemplate(s) {
+      let cards = '';
+      (s.items || []).forEach(item => {
+        let badgeStyle = "bg-marine-800 text-slate-300";
+        let cardStyle = "border-white/10 bg-marine-950/60";
+
+        if (item.status === "COMPLETED") {
+          badgeStyle = "bg-tealBlue-mint/20 text-tealBlue-mint border border-tealBlue-mint/30";
+        } else if (item.status === "NOW") {
+          badgeStyle = "bg-neon-coral text-white font-bold animate-pulse";
+          cardStyle = "border-azure bg-azure/10 glow-azure";
+        } else if (item.status === "UPCOMING") {
+          badgeStyle = "bg-azure/20 text-azure border border-azure/40";
+        }
+
+        cards += `
+          <div class="p-4 rounded-2xl border ${cardStyle} flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-xs font-bold text-neon-sun">${item.time}</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full ${badgeStyle}">${item.status}</span>
+              </div>
+              <h4 class="font-bold text-white text-sm sm:text-base mb-1">${item.title}</h4>
+            </div>
+            <div class="text-xs font-mono text-slate-400 mt-2 flex items-center gap-1">
+              <i class="fa-solid fa-map-pin text-neon-coral"></i> ${item.loc}
+            </div>
+          </div>
+        `;
+      });
+
+      return `
+        <div class="h-full flex flex-col justify-between py-1">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div>
+              <span class="text-xs font-mono text-tealBlue-mint uppercase font-bold tracking-widest block">${s.subtitle || 'Itinerary'}</span>
+              <h2 class="text-xl sm:text-2xl font-party text-white">${s.title}</h2>
+            </div>
+            <div class="font-mono text-xs text-neon-mint bg-neon-mint/10 px-3 py-1 rounded-full border border-neon-mint/30">
+              ☀️ Outdoor Conditions: Optimal
+            </div>
+          </div>
+
+          <div class="my-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${cards}
+            </div>
+          </div>
+
+          <div class="text-center font-mono text-[11px] text-slate-400">
+            Agenda times adapt dynamically based on tournament pace
+          </div>
+        </div>
+      `;
+    }
+
+    /* Template 5: Photo / Meme Spotlight */
+    function renderPhotoSpotlightTemplate(s) {
+      return `
+        <div class="h-full flex flex-col justify-between py-1">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div>
+              <span class="text-xs font-mono text-purple-300 uppercase font-bold tracking-widest block">Spotlight Frame</span>
+              <h2 class="text-xl sm:text-2xl font-party text-white">${s.title}</h2>
+            </div>
+            <button onclick="blastConfetti(true)" class="px-3 py-1 bg-neon-coral text-white font-bold font-mono text-xs rounded-xl shadow-md hover:brightness-110 transition">
+              ❤️ Clap & Cheer!
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-center">
+            <div class="lg:col-span-7 bg-marine-950/80 p-3 rounded-3xl border-2 border-neon-purple glow-azure flex items-center justify-center overflow-hidden max-h-[58vh]">
+              <img src="${s.photoUrl}" alt="Spotlight Photo" class="w-full h-full object-cover rounded-2xl max-h-[54vh]" onerror="this.src='https://placehold.co/800x500/028090/ffffff?text=OUTING+PHOTO';">
+            </div>
+
+            <div class="lg:col-span-5 bg-gradient-to-br from-marine-900 to-marine-950 p-6 rounded-3xl border border-white/10 flex flex-col justify-between gap-4">
+              <div>
+                <span class="text-3xl">💬</span>
+                <blockquote class="text-lg sm:text-2xl font-display text-neon-sun font-bold mt-2 leading-relaxed">
+                  "${s.caption}"
+                </blockquote>
+                <div class="text-xs font-mono text-azure mt-3">— ${s.author || 'Anonymous Outing Scout'}</div>
+              </div>
+
+              <div class="p-3.5 bg-marine-950/90 rounded-2xl border border-neon-coral/30 flex items-center justify-between">
+                <span class="font-mono text-xs text-slate-300">Live Crowd Applause:</span>
+                <span class="text-xl font-party text-neon-coral">${s.reactions || 142} 👏</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center font-mono text-[11px] text-slate-400">
+            Submit your memes to the DJ booth to feature in the next spotlight cycle
+          </div>
+        </div>
+      `;
+    }
+
+    /* Template 6: Survival Protocols */
+    function renderPartyRulesTemplate(s) {
+      let cards = '';
+      (s.guidelines || []).forEach(g => {
+        cards += `
+          <div class="bg-marine-950/70 border border-azure/30 p-5 rounded-3xl flex flex-col justify-between">
+            <div>
+              <div class="text-3xl mb-2">${g.icon || '🍹'}</div>
+              <h3 class="font-party text-base text-azure uppercase mb-2">${g.title}</h3>
+              <p class="text-xs text-slate-300 font-sans leading-relaxed">${g.text}</p>
+            </div>
+            <div class="bg-marine-900/80 p-2.5 rounded-xl border border-white/10 text-[11px] font-mono text-neon-sun mt-4">
+              Safety rule enforced by all squad leads.
+            </div>
+          </div>
+        `;
+      });
+
+      return `
+        <div class="h-full flex flex-col justify-between py-1">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div>
+              <span class="text-xs font-mono text-neon-coral uppercase font-bold tracking-widest block">${s.subtitle || 'Safety First'}</span>
+              <h2 class="text-xl sm:text-2xl font-party text-white">${s.title}</h2>
+            </div>
+            <span class="text-xs font-mono bg-neon-sun/20 text-neon-sun px-3 py-1 rounded-full border border-neon-sun/40">
+              Medical Tent: Palm Pavilion
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 my-auto">
+            ${cards}
+          </div>
+
+          <div class="bg-marine-950/80 p-2.5 rounded-2xl border border-neon-mint/30 text-center font-mono text-xs text-neon-mint">
+            ${s.medicalNote || 'First Aid available at Gazebo 3'}
+          </div>
+        </div>
+      `;
+    }
+
+    /* ========================================================
+       LIVE WEATHER API (Open-Meteo) & HEADER
+       ======================================================== */
+    async function syncWeather() {
+      const g = consoleData.global;
+      const lat = g.lat || 15.2993;
+      const lon = g.lon || 74.1240;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto`;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Weather API did not respond");
+        const json = await res.json();
+        if (json && json.current) {
+          const temp = Math.round(json.current.temperature_2m);
+          const wind = Math.round(json.current.wind_speed_10m);
+          const code = json.current.weather_code;
+
+          document.getElementById('weatherTemp').textContent = `${temp}°C`;
+          document.getElementById('weatherCity').textContent = g.cityWeatherLabel || "Resort";
+
+          let condition = "Sunny Beach Day";
+          let icon = "fa-solid fa-sun text-neon-sun";
+
+          if (code === 0) { condition = "Clear Skies"; icon = "fa-solid fa-sun text-neon-sun"; }
+          else if ([1, 2, 3].includes(code)) { condition = "Tropical Sun"; icon = "fa-solid fa-cloud-sun text-neon-sun"; }
+          else if ([51, 61, 80].includes(code)) { condition = "Warm Sprinkles"; icon = "fa-solid fa-cloud-rain text-azure"; }
+          else { condition = `Breezy (${wind} km/h)`; icon = "fa-solid fa-wind text-tealBlue-mint"; }
+
+          document.getElementById('weatherCondition').textContent = condition;
+          document.getElementById('weatherIcon').className = icon;
+        }
+      } catch (err) {
+        document.getElementById('weatherTemp').textContent = "29°C";
+        document.getElementById('weatherCity').textContent = g.cityWeatherLabel || "Goa Beach";
+        document.getElementById('weatherCondition').textContent = "Tropical Sun 🌴";
+        document.getElementById('weatherIcon').className = "fa-solid fa-sun text-neon-sun";
+      }
+    }
+
+    function renderGlobalHeader() {
+      const g = consoleData.global;
+      document.getElementById('navEventTitle').textContent = g.eventTitle;
+      document.getElementById('navDateText').textContent = g.eventDate || "Oct 15, 2026";
+      document.getElementById('navVenueText').textContent = g.venueText;
+      document.getElementById('navLeftLogo').src = g.navLeftLogo;
+      document.getElementById('navRightLogo').src = g.navRightLogo;
+    }
+
+    function updateDigitalClock() {
+      const now = new Date();
+      document.getElementById('clockDisplay').textContent = now.toLocaleTimeString();
+    }
+
+    /* ========================================================
+       ADMIN STUDIO DRAWER CONTROLLER
+       ======================================================== */
+    function openAdmin() {
+      populateAdminFields();
+      renderAdminSlideList();
+      renderAdminScheduleList();
+      document.getElementById('adminDrawer').classList.remove('hidden');
+    }
+
+    function closeAdmin() {
+      document.getElementById('adminDrawer').classList.add('hidden');
+    }
+
+    function switchAdminTab(tab) {
+      document.getElementById('tabContentSlides').classList.add('hidden');
+      document.getElementById('tabContentSystem').classList.add('hidden');
+      document.getElementById('tabContentHosting').classList.add('hidden');
+      document.getElementById('tabContentSchedule').classList.add('hidden');
+      document.getElementById('tabContentHeader').classList.add('hidden');
+
+      document.getElementById('tabBtnSlides').className = "py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0";
+      document.getElementById('tabBtnSystem').className = "py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0";
+      document.getElementById('tabBtnHosting').className = "py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0";
+      document.getElementById('tabBtnSchedule').className = "py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0";
+      document.getElementById('tabBtnHeader').className = "py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0";
+
+      if (tab === 'slides') {
+        document.getElementById('tabContentSlides').classList.remove('hidden');
+        document.getElementById('tabBtnSlides').className = "py-3 px-4 border-b-2 border-azure font-bold text-azure flex items-center gap-2 flex-shrink-0";
+      } else if (tab === 'system') {
+        document.getElementById('tabContentSystem').classList.remove('hidden');
+        document.getElementById('tabBtnSystem').className = "py-3 px-4 border-b-2 border-emerald-400 font-bold text-emerald-400 flex items-center gap-2 flex-shrink-0";
+      } else if (tab === 'hosting') {
+        document.getElementById('tabContentHosting').classList.remove('hidden');
+        document.getElementById('tabBtnHosting').className = "py-3 px-4 border-b-2 border-purple-400 font-bold text-purple-400 flex items-center gap-2 flex-shrink-0";
+      } else if (tab === 'schedule') {
+        document.getElementById('tabContentSchedule').classList.remove('hidden');
+        document.getElementById('tabBtnSchedule').className = "py-3 px-4 border-b-2 border-neon-sun font-bold text-neon-sun flex items-center gap-2 flex-shrink-0";
+      } else if (tab === 'header') {
+        document.getElementById('tabContentHeader').classList.remove('hidden');
+        document.getElementById('tabBtnHeader').className = "py-3 px-4 border-b-2 border-tealBlue-mint font-bold text-tealBlue-mint flex items-center gap-2 flex-shrink-0";
+      }
+    }
+
+    function populateAdminFields() {
+      const g = consoleData.global;
+      document.getElementById('cfgNavLeftLogo').value = g.navLeftLogo;
+      document.getElementById('cfgNavRightLogo').value = g.navRightLogo;
+      document.getElementById('previewLeftImg').src = g.navLeftLogo;
+      document.getElementById('previewRightImg').src = g.navRightLogo;
+
+      document.getElementById('cfgNavTitle').value = g.eventTitle;
+      document.getElementById('cfgNavEventDate').value = g.eventDate || "Oct 15, 2026";
+      document.getElementById('cfgNavVenue').value = g.venueText;
+      document.getElementById('cfgNavCity').value = g.cityWeatherLabel;
+      document.getElementById('cfgNavLat').value = g.lat;
+      document.getElementById('cfgNavLon').value = g.lon;
+
+      document.getElementById('cfgCloudRoomId').value = g.cloudRoomId || "outing-goa-live";
+      document.getElementById('cfgCloudPollInterval').value = g.cloudPollSec !== undefined ? g.cloudPollSec : 10;
+    }
+
+    function previewLogo(inputId, imgId) {
+      const val = document.getElementById(inputId).value.trim();
+      document.getElementById(imgId).src = val;
+    }
+
+    function renderAdminSlideList() {
+      const container = document.getElementById('adminSlidesList');
+      container.innerHTML = '';
+
+      consoleData.slides.forEach((slide, idx) => {
+        const item = document.createElement('div');
+        item.className = "p-3.5 bg-marine-950/80 border border-azure/20 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono text-xs";
+        
+        let typeBadgeColor = "text-azure bg-azure/10 border-azure/30";
+        if (slide.type === 'NOW_OPS') typeBadgeColor = "text-neon-coral bg-neon-coral/10 border-neon-coral/30";
+        if (slide.type === 'LEADERBOARD') typeBadgeColor = "text-tealBlue-mint bg-tealBlue/10 border-tealBlue/30";
+        if (slide.type === 'TIMELINE') typeBadgeColor = "text-neon-mint bg-neon-mint/10 border-neon-mint/30";
+
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-marine-900 border border-azure/30 flex items-center justify-center font-bold text-azure text-sm">
+              <i class="fa-solid fa-file-powerpoint"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white text-sm">${slide.name}</span>
+                <span class="px-2 py-0.5 rounded-full border text-[9px] uppercase ${typeBadgeColor}">${slide.type}</span>
+                ${slide.autoConfetti ? '<span class="px-2 py-0.5 rounded-full bg-neon-sun/20 text-neon-sun border border-neon-sun/40 text-[9px]">🎉 Confetti (' + (slide.confettiIntervalSec || 10) + 's)</span>' : ''}
+                ${slide.timerEnabled ? '<span class="px-2 py-0.5 rounded-full bg-neon-coral/20 text-neon-coral border border-neon-coral/40 text-[9px]">⏱️ Timer (' + Math.round(slide.timerDurationSec / 60) + 'm)</span>' : ''}
+              </div>
+              <div class="text-[10px] text-slate-400 truncate max-w-sm mt-0.5">
+                ${slide.title || slide.headline || 'Presentation Slide'}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 self-end sm:self-center">
+            <button onclick="moveSlide(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-marine-900 border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center text-slate-300" title="Move Up">
+              <i class="fa-solid fa-arrow-up text-xs"></i>
+            </button>
+            <button onclick="moveSlide(${idx}, 1)" ${idx === consoleData.slides.length - 1 ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-marine-900 border border-white/10 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center text-slate-300" title="Move Down">
+              <i class="fa-solid fa-arrow-down text-xs"></i>
+            </button>
+            <button onclick="duplicateSlide(${idx})" class="px-2.5 py-1.5 rounded-lg bg-marine-800 hover:bg-marine-700 text-azure border border-azure/30 flex items-center gap-1" title="Duplicate">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+            <button onclick="openSlideEditModal(${idx})" class="px-3 py-1.5 rounded-lg bg-azure hover:brightness-110 text-black font-bold flex items-center gap-1 shadow-sm">
+              <i class="fa-solid fa-pen-to-square"></i> Edit
+            </button>
+            <button onclick="deleteSlide(${idx})" class="w-8 h-8 rounded-lg bg-rose-950/60 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-600/40 flex items-center justify-center" title="Delete">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function moveSlide(index, delta) {
+      const newIndex = index + delta;
+      if (newIndex < 0 || newIndex >= consoleData.slides.length) return;
+      const temp = consoleData.slides[index];
+      consoleData.slides[index] = consoleData.slides[newIndex];
+      consoleData.slides[newIndex] = temp;
+      persistData();
+      renderAdminSlideList();
+      renderSlides();
+      pushToCloud(false);
+    }
+
+    function duplicateSlide(index) {
+      const copy = JSON.parse(JSON.stringify(consoleData.slides[index]));
+      copy.id = "slide-" + Date.now();
+      copy.name += " (Copy)";
+      consoleData.slides.splice(index + 1, 0, copy);
+      persistData();
+      renderAdminSlideList();
+      renderSlides();
+      pushToCloud(false);
+    }
+
+    function deleteSlide(index) {
+      if (consoleData.slides.length <= 1) return;
+      consoleData.slides.splice(index, 1);
+      if (currentSlideIndex >= consoleData.slides.length) {
+        currentSlideIndex = consoleData.slides.length - 1;
+      }
+      persistData();
+      renderAdminSlideList();
+      renderSlides();
+      pushToCloud(false);
+    }
+
+    function openTemplateSelectorModal() {
+      document.getElementById('templatePickerModal').classList.remove('hidden');
+    }
+
+    function closeTemplateSelectorModal() {
+      document.getElementById('templatePickerModal').classList.add('hidden');
+    }
+
+    function addSlideFromTemplate(type) {
+      let newSlide = null;
+      const id = "slide-" + Date.now();
+
+      if (type === 'HERO_WELCOME') {
+        newSlide = {
+          id, type, name: "Welcome Hero",
+          autoConfetti: true,
+          confettiIntervalSec: 10,
+          timerEnabled: false,
+          timerDurationSec: 300,
+          badge: "🌴 OUT OF OFFICE & INTO THE SUN 🌴",
+          headline: "WELCOME TO GETTOGETHER!",
+          subhead: "🔥 Zero Bugs Today, Only Barbecue, Chilled Brews & Beach Chaos! 🥥",
+          stat1Label: "Total Humans", stat1Val: "148 Pax",
+          stat2Label: "Slack Allowed", stat2Val: "ZERO",
+          stat3Label: "Current Arena", stat3Val: "Coconut Lawn",
+          stat4Label: "Sunscreen", stat4Val: "SPF 50+"
+        };
+      } else if (type === 'NOW_OPS') {
+        newSlide = {
+          id, type, name: "What's Happening Now",
+          autoConfetti: false,
+          confettiIntervalSec: 12,
+          timerEnabled: true,
+          timerDurationSec: 900,
+          zone: "ZONE: BEACH SURF LAWN",
+          title: "🏐 VOLLEYBALL GRAND PRIX SEMI-FINALS",
+          desc: "Top 4 squads duel for the golden net bounty! Sand shoes recommended. Keep eye on the wind conditions.",
+          host: "Coach Priya", keyRule: "Maximum 3 touches per return", bounty: "Tropical Fruit Hamper",
+          targetEndTime: "16:30", nextTime: "04:30 PM", nextTitle: "Coconut Water & Chill Intermission",
+          nextDesc: "Rehydrate and gather for the grand team photo."
+        };
+      } else if (type === 'LEADERBOARD') {
+        newSlide = {
+          id, type, name: "Squad Standings",
+          autoConfetti: false,
+          confettiIntervalSec: 12,
+          timerEnabled: false,
+          timerDurationSec: 300,
+          title: "🏆 SQUAD STANDINGS & COMEDY PENALTIES",
+          subtitle: "Current tournament points",
+          squads: [
+            { name: "Squad Alpha", emoji: "⚡", pts: 2100, badge: "Match Winner", status: "Active" },
+            { name: "Squad Beta", emoji: "🔥", pts: 1950, badge: "High Spirit", status: "Active" }
+          ],
+          penalties: [
+            { rule: "Mentions sprint deadline", penalty: "5 burpees in the sand" }
+          ]
+        };
+      } else if (type === 'TIMELINE') {
+        newSlide = {
+          id, type, name: "Outing Itinerary",
+          autoConfetti: false,
+          confettiIntervalSec: 12,
+          timerEnabled: false,
+          timerDurationSec: 300,
+          title: "📅 FULL OUTING ITINERARY",
+          subtitle: "Event Horizon",
+          items: [
+            { time: "02:00 PM", title: "Arrival & Welcome Drinks", status: "COMPLETED", loc: "Main Entrance" },
+            { time: "04:00 PM", title: "Team Sand Games", status: "NOW", loc: "Beach Arena" }
+          ]
+        };
+      } else if (type === 'PHOTO_SPOTLIGHT') {
+        newSlide = {
+          id, type, name: "Meme of the Hour",
+          autoConfetti: false,
+          confettiIntervalSec: 10,
+          timerEnabled: false,
+          timerDurationSec: 180,
+          title: "📸 OUTING SHOUTOUT & MEME",
+          photoUrl: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=900&auto=format&fit=crop&q=80",
+          caption: "When the deployment passes without a single rollback right before the bus leaves.",
+          author: "The SRE Squad", reactions: 156
+        };
+      } else if (type === 'PARTY_RULES') {
+        newSlide = {
+          id, type, name: "Survival Protocol",
+          autoConfetti: false,
+          confettiIntervalSec: 12,
+          timerEnabled: false,
+          timerDurationSec: 240,
+          title: "🛡️ OUTING SURVIVAL & SAFETY PROTOCOL",
+          subtitle: "Essential guidelines",
+          guidelines: [
+            { icon: "🍹", title: "Hydrate Constantly", text: "Free coolers and coconuts are available at Gazebo 2." }
+          ],
+          medicalNote: "Medical staff stationed at Pavilion Room 101."
+        };
+      }
+
+      if (newSlide) {
+        consoleData.slides.push(newSlide);
+        persistData();
+        closeTemplateSelectorModal();
+        renderAdminSlideList();
+        renderSlides();
+        goToSlide(consoleData.slides.length - 1);
+        blastConfetti(true);
+        pushToCloud(false);
+      }
+    }
+
+    /* ========================================================
+       SCHEDULE TIMELINE MARQUEE ADMIN EDITOR
+       ======================================================== */
+    function renderAdminScheduleList() {
+      const container = document.getElementById('scheduleItemsAdminList');
+      container.innerHTML = '';
+      const items = consoleData.global.scheduleItems || [];
+
+      items.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = "p-3 bg-marine-950 rounded-xl border border-white/10 flex flex-col sm:flex-row items-center gap-2.5";
+        row.innerHTML = `
+          <input type="text" value="${item.time}" onchange="updateScheduleItemField(${idx}, 'time', this.value)" class="w-full sm:w-28 bg-marine-900 border border-slate-700 rounded-lg px-2.5 py-1 text-neon-sun font-bold outline-none focus:border-azure">
+          <input type="text" value="${item.label}" onchange="updateScheduleItemField(${idx}, 'label', this.value)" class="w-full sm:flex-1 bg-marine-900 border border-slate-700 rounded-lg px-2.5 py-1 text-white outline-none focus:border-azure">
+          <select onchange="updateScheduleItemField(${idx}, 'status', this.value)" class="w-full sm:w-28 bg-marine-900 border border-slate-700 rounded-lg px-2.5 py-1 text-azure outline-none">
+            <option value="DONE" ${item.status === 'DONE' ? 'selected' : ''}>DONE</option>
+            <option value="NOW" ${item.status === 'NOW' ? 'selected' : ''}>NOW</option>
+            <option value="UPCOMING" ${item.status === 'UPCOMING' ? 'selected' : ''}>UPCOMING</option>
+          </select>
+          <button onclick="deleteScheduleItem(${idx})" class="w-8 h-8 rounded-lg bg-rose-950/60 hover:bg-rose-600 text-rose-300 hover:text-white flex items-center justify-center transition">
+            <i class="fa-solid fa-trash-can text-xs"></i>
+          </button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function updateScheduleItemField(idx, field, val) {
+      if (!consoleData.global.scheduleItems[idx]) return;
+      consoleData.global.scheduleItems[idx][field] = val;
+      persistData();
+      renderScheduleMarquee();
+      pushToCloud(false);
+    }
+
+    function addScheduleItem() {
+      if (!consoleData.global.scheduleItems) consoleData.global.scheduleItems = [];
+      consoleData.global.scheduleItems.push({
+        time: "04:30 PM",
+        label: "New Outing Activity Event 🌴",
+        status: "UPCOMING"
+      });
+      persistData();
+      renderAdminScheduleList();
+      renderScheduleMarquee();
+      pushToCloud(false);
+    }
+
+    function deleteScheduleItem(idx) {
+      consoleData.global.scheduleItems.splice(idx, 1);
+      persistData();
+      renderAdminScheduleList();
+      renderScheduleMarquee();
+      pushToCloud(false);
+    }
+
+    /* ========================================================
+       SLIDE FIELD EDITOR MODAL (STATS 1-4 FULLY EDITABLE)
+       ======================================================== */
+    function openSlideEditModal(idx) {
+      currentlyEditingSlideIndex = idx;
+      const slide = consoleData.slides[idx];
+      document.getElementById('editSlideModalTitle').textContent = `Edit: ${slide.name}`;
+      document.getElementById('editSlideModalSubtitle').textContent = `Template: ${slide.type}`;
+
+      const container = document.getElementById('slideEditorFields');
+      container.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-marine-950/80 p-3.5 rounded-2xl border border-azure/20">
+          <div>
+            <label class="block text-slate-300 font-bold mb-1">Slide Display Name</label>
+            <input id="editSlideName" type="text" value="${slide.name || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-xl px-3 py-1.5 text-white focus:border-azure outline-none">
+          </div>
+          <div>
+            <label class="block text-neon-sun font-bold mb-1">🎉 Auto Celebration Confetti</label>
+            <div class="flex items-center gap-3 mt-1">
+              <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                <input id="editAutoConfetti" type="checkbox" ${slide.autoConfetti ? 'checked' : ''} class="w-4 h-4 rounded text-azure accent-azure">
+                <span class="text-white">Active</span>
+              </label>
+              <div class="flex items-center gap-1.5 text-slate-400">
+                <span>Every</span>
+                <input id="editConfettiInterval" type="number" min="4" max="60" value="${slide.confettiIntervalSec || 10}" class="w-14 bg-marine-900 border border-slate-700 rounded-lg px-2 py-0.5 text-center text-white focus:border-azure outline-none">
+                <span>sec</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PER-SLIDE COUNTDOWN TIMER CONFIGURATION -->
+        <div class="bg-marine-950/80 p-3.5 rounded-2xl border border-neon-sun/30 space-y-2">
+          <label class="block text-neon-sun font-bold">⏱️ Slide Countdown Timer HUD</label>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <label class="inline-flex items-center gap-2 cursor-pointer">
+              <input id="editTimerEnabled" type="checkbox" ${slide.timerEnabled ? 'checked' : ''} class="w-4 h-4 rounded text-neon-sun accent-yellow-400">
+              <span class="text-white">Show on-screen timer HUD during this slide</span>
+            </label>
+            <div class="flex items-center gap-2 text-slate-300">
+              <span>Duration:</span>
+              <input id="editTimerDurationSec" type="number" min="10" max="7200" step="10" value="${slide.timerDurationSec || 300}" class="w-20 bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-neon-sun font-bold outline-none focus:border-neon-sun">
+              <span>seconds (${Math.round((slide.timerDurationSec || 300)/60)} min)</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (slide.type === 'HERO_WELCOME') {
+        container.innerHTML += `
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Top Pill / Badge</label>
+            <input id="editHeroBadge" type="text" value="${slide.badge || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Big Headline Title</label>
+            <input id="editHeroHeadline" type="text" value="${slide.headline || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Funny Subhead / Punchline</label>
+            <input id="editHeroSubhead" type="text" value="${slide.subhead || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+          
+          <!-- ALL 4 STAT STACKS FULLY EDITABLE -->
+          <div class="border-t border-white/10 pt-3">
+            <span class="font-bold text-azure text-xs uppercase tracking-wider block mb-2">Configure All 4 Hero Stat Cards (Stacks 1 to 4):</span>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Stack 1 -->
+              <div class="bg-marine-950 p-3 rounded-xl border border-azure/30">
+                <span class="text-azure font-bold block mb-1">Card 1 (Left)</span>
+                <input id="editHeroStat1L" type="text" placeholder="Label" value="${slide.stat1Label || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-white mb-1.5">
+                <input id="editHeroStat1V" type="text" placeholder="Value" value="${slide.stat1Val || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-azure font-bold">
+              </div>
+              
+              <!-- Stack 2 -->
+              <div class="bg-marine-950 p-3 rounded-xl border border-neon-coral/30">
+                <span class="text-neon-coral font-bold block mb-1">Card 2</span>
+                <input id="editHeroStat2L" type="text" placeholder="Label" value="${slide.stat2Label || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-white mb-1.5">
+                <input id="editHeroStat2V" type="text" placeholder="Value" value="${slide.stat2Val || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-neon-coral font-bold">
+              </div>
+
+              <!-- Stack 3 (FULLY EDITABLE) -->
+              <div class="bg-marine-950 p-3 rounded-xl border border-tealBlue-vibrant/40">
+                <span class="text-tealBlue-mint font-bold block mb-1">Card 3 (Stack 3)</span>
+                <input id="editHeroStat3L" type="text" placeholder="Label" value="${slide.stat3Label || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-white mb-1.5">
+                <input id="editHeroStat3V" type="text" placeholder="Value" value="${slide.stat3Val || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-tealBlue-mint font-bold">
+              </div>
+
+              <!-- Stack 4 (FULLY EDITABLE) -->
+              <div class="bg-marine-950 p-3 rounded-xl border border-neon-mint/30">
+                <span class="text-neon-mint font-bold block mb-1">Card 4 (Stack 4)</span>
+                <input id="editHeroStat4L" type="text" placeholder="Label" value="${slide.stat4Label || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-white mb-1.5">
+                <input id="editHeroStat4V" type="text" placeholder="Value" value="${slide.stat4Val || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-neon-mint font-bold">
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (slide.type === 'NOW_OPS') {
+        container.innerHTML += `
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Current Activity Title</label>
+            <input id="editNowTitle" type="text" value="${slide.title || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Zone / Location Tag</label>
+            <input id="editNowZone" type="text" value="${slide.zone || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Activity Description & Rules</label>
+            <textarea id="editNowDesc" rows="3" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">${slide.desc || ''}</textarea>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div>
+              <label class="block text-slate-400">Game Host</label>
+              <input id="editNowHost" type="text" value="${slide.host || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-2 py-1.5 text-white">
+            </div>
+            <div>
+              <label class="block text-slate-400">Key Rule</label>
+              <input id="editNowRule" type="text" value="${slide.keyRule || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-2 py-1.5 text-white">
+            </div>
+            <div>
+              <label class="block text-slate-400">Target End Time</label>
+              <input id="editNowTargetTime" type="text" value="${slide.targetEndTime || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-2 py-1.5 text-white">
+            </div>
+          </div>
+          <div class="border-t border-white/10 pt-3 space-y-2">
+            <span class="font-bold text-tealBlue-mint block">Up Next Preview:</span>
+            <input id="editNextTitle" type="text" placeholder="Up Next Title" value="${slide.nextTitle || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+            <input id="editNextTime" type="text" placeholder="Up Next Time" value="${slide.nextTime || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-neon-sun">
+            <textarea id="editNextDesc" rows="2" placeholder="Up Next Description" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">${slide.nextDesc || ''}</textarea>
+          </div>
+        `;
+      } else if (slide.type === 'PHOTO_SPOTLIGHT') {
+        container.innerHTML += `
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Slide Headline</label>
+            <input id="editPhotoTitle" type="text" value="${slide.title || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Photo / GIF Image URL</label>
+            <input id="editPhotoUrl" type="text" value="${slide.photoUrl || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Funny Caption / Quote</label>
+            <textarea id="editPhotoCaption" rows="2" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">${slide.caption || ''}</textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400">Quote Author / Spotter</label>
+              <input id="editPhotoAuthor" type="text" value="${slide.author || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+            </div>
+            <div>
+              <label class="block text-slate-400">Applause Count</label>
+              <input id="editPhotoReactions" type="number" value="${slide.reactions || 100}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML += `
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Title</label>
+            <input id="editGenericTitle" type="text" value="${slide.title || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-slate-400 font-bold">Subtitle</label>
+            <input id="editGenericSubtitle" type="text" value="${slide.subtitle || ''}" class="w-full bg-marine-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+        `;
+      }
+
+      document.getElementById('slideEditModal').classList.remove('hidden');
+    }
+
+    function closeSlideEditModal() {
+      document.getElementById('slideEditModal').classList.add('hidden');
+      currentlyEditingSlideIndex = -1;
+    }
+
+    function saveCurrentSlideEdits() {
+      if (currentlyEditingSlideIndex < 0) return;
+      const slide = consoleData.slides[currentlyEditingSlideIndex];
+
+      const nameInput = document.getElementById('editSlideName');
+      if (nameInput) slide.name = nameInput.value.trim() || slide.name;
+
+      slide.autoConfetti = document.getElementById('editAutoConfetti').checked;
+      slide.confettiIntervalSec = parseInt(document.getElementById('editConfettiInterval').value, 10) || 10;
+
+      slide.timerEnabled = document.getElementById('editTimerEnabled').checked;
+      slide.timerDurationSec = parseInt(document.getElementById('editTimerDurationSec').value, 10) || 300;
+
+      if (slide.type === 'HERO_WELCOME') {
+        slide.badge = document.getElementById('editHeroBadge').value.trim();
+        slide.headline = document.getElementById('editHeroHeadline').value.trim();
+        slide.subhead = document.getElementById('editHeroSubhead').value.trim();
+        
+        slide.stat1Label = document.getElementById('editHeroStat1L').value.trim();
+        slide.stat1Val = document.getElementById('editHeroStat1V').value.trim();
+        slide.stat2Label = document.getElementById('editHeroStat2L').value.trim();
+        slide.stat2Val = document.getElementById('editHeroStat2V').value.trim();
+
+        slide.stat3Label = document.getElementById('editHeroStat3L').value.trim();
+        slide.stat3Val = document.getElementById('editHeroStat3V').value.trim();
+        slide.stat4Label = document.getElementById('editHeroStat4L').value.trim();
+        slide.stat4Val = document.getElementById('editHeroStat4V').value.trim();
+
+      } else if (slide.type === 'NOW_OPS') {
+        slide.title = document.getElementById('editNowTitle').value.trim();
+        slide.zone = document.getElementById('editNowZone').value.trim();
+        slide.desc = document.getElementById('editNowDesc').value.trim();
+        slide.host = document.getElementById('editNowHost').value.trim();
+        slide.keyRule = document.getElementById('editNowRule').value.trim();
+        slide.targetEndTime = document.getElementById('editNowTargetTime').value.trim();
+        slide.nextTitle = document.getElementById('editNextTitle').value.trim();
+        slide.nextTime = document.getElementById('editNextTime').value.trim();
+        slide.nextDesc = document.getElementById('editNextDesc').value.trim();
+      } else if (slide.type === 'PHOTO_SPOTLIGHT') {
+        slide.title = document.getElementById('editPhotoTitle').value.trim();
+        slide.photoUrl = document.getElementById('editPhotoUrl').value.trim();
+        slide.caption = document.getElementById('editPhotoCaption').value.trim();
+        slide.author = document.getElementById('editPhotoAuthor').value.trim();
+        slide.reactions = parseInt(document.getElementById('editPhotoReactions').value, 10) || slide.reactions;
+      } else {
+        const titleEl = document.getElementById('editGenericTitle');
+        if (titleEl) slide.title = titleEl.value.trim();
+        const subEl = document.getElementById('editGenericSubtitle');
+        if (subEl) slide.subtitle = subEl.value.trim();
+      }
+
+      persistData();
+      closeSlideEditModal();
+      renderAdminSlideList();
+      renderSlides();
+      pushToCloud(false);
+    }
+
+    function saveGlobalAdminSettings() {
+      const g = consoleData.global;
+      g.navLeftLogo = document.getElementById('cfgNavLeftLogo').value.trim() || g.navLeftLogo;
+      g.navRightLogo = document.getElementById('cfgNavRightLogo').value.trim() || g.navRightLogo;
+      g.eventTitle = document.getElementById('cfgNavTitle').value.trim() || g.eventTitle;
+      g.eventDate = document.getElementById('cfgNavEventDate').value.trim() || g.eventDate;
+      g.venueText = document.getElementById('cfgNavVenue').value.trim() || g.venueText;
+      g.cityWeatherLabel = document.getElementById('cfgNavCity').value.trim() || g.cityWeatherLabel;
+      g.lat = parseFloat(document.getElementById('cfgNavLat').value) || g.lat;
+      g.lon = parseFloat(document.getElementById('cfgNavLon').value) || g.lon;
+
+      g.cloudRoomId = document.getElementById('cfgCloudRoomId').value.trim() || g.cloudRoomId;
+      g.cloudPollSec = parseInt(document.getElementById('cfgCloudPollInterval').value, 10);
+
+      persistData();
+      renderGlobalHeader();
+      syncWeather();
+      renderScheduleMarquee();
+      setupCloudPolling();
+      closeAdmin();
+      pushToCloud(true);
+    }
+
+    /* ========================================================
+       JSON EXPORT / IMPORT FOR HOSTING
+       ======================================================== */
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(consoleData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `outing_console_config_${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && parsed.slides && parsed.global) {
+            consoleData = parsed;
+            persistData();
+            currentSlideIndex = 0;
+            renderGlobalHeader();
+            syncWeather();
+            renderScheduleMarquee();
+            renderSlides();
+            renderAdminSlideList();
+            populateAdminFields();
+            pushToCloud(true);
+          }
+        } catch (err) {
+          console.error("Could not parse JSON file", err);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetDefaults() {
+      localStorage.removeItem('team_outing_console_cloud_v7');
+      consoleData = JSON.parse(JSON.stringify(DEFAULT_CONSOLE_DATA));
+      persistData();
+      currentSlideIndex = 0;
+      renderGlobalHeader();
+      syncWeather();
+      renderScheduleMarquee();
+      renderSlides();
+      renderAdminSlideList();
+      populateAdminFields();
+      blastConfetti(true);
+      pushToCloud(true);
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(e => console.warn(e));
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    /* ========================================================
+       LIVE AMBIENT PARTICLES
+       ======================================================== */
+    function initAmbientCanvas() {
+      const canvas = document.getElementById('ambientCanvas');
+      const ctx = canvas.getContext('2d');
+      let w = canvas.width = window.innerWidth;
+      let h = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      const emojis = ['🌴', '🥥', '🍹', '🕶️', '🏖️', '🍍', '✨', '🍉'];
+      const particles = [];
+
+      for (let i = 0; i < 26; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          size: 14 + Math.random() * 20,
+          speedY: 0.35 + Math.random() * 0.5,
+          speedX: (Math.random() - 0.5) * 0.3,
+          emoji: emojis[Math.floor(Math.random() * emojis.length)],
+          opacity: 0.12 + Math.random() * 0.22
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        particles.forEach(p => {
+          ctx.globalAlpha = p.opacity;
+          ctx.font = `${p.size}px sans-serif`;
+          ctx.fillText(p.emoji, p.x, p.y);
+
+          p.y -= p.speedY;
+          p.x += p.speedX;
+
+          if (p.y < -30) {
+            p.y = h + 20;
+            p.x = Math.random() * w;
+          }
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    /* ========================================================
+       APPLICATION BOOTSTRAP
+       ======================================================== */
+    window.onload = function() {
+      renderGlobalHeader();
+      syncWeather();
+      renderScheduleMarquee();
+      renderSlides();
+      initAmbientCanvas();
+      setupCloudPolling();
+
+      // Screen wake lock runs silently in background to keep screen on
+      requestScreenWakeLock();
+
+      // Check cloud for existing room updates
+      pullFromCloud(false);
+
+      setInterval(updateDigitalClock, 1000);
+      updateDigitalClock();
+
+      setInterval(syncWeather, 15 * 60 * 1000);
+
+      window.addEventListener('keydown', (e) => {
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT') {
+          return;
+        }
+
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+          nextSlide();
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+          prevSlide();
+        } else if (e.key.toLowerCase() === 'f') {
+          toggleFullScreen();
+        } else if (e.key.toLowerCase() === 'a') {
+          openAdmin();
+        } else if (e.key === ' ') {
+          e.preventDefault();
+          blastConfetti(true);
+        }
+      });
+    };
+  </script>
+</body>
+</html>
