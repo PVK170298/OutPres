@@ -176,11 +176,11 @@
   <!-- ======================================================== -->
   <header class="relative z-30 w-full px-4 sm:px-6 py-2 border-b border-azure/25 bg-marine-950/90 backdrop-blur-md flex items-center justify-between shadow-2xl">
     
-    <!-- LEFT: Corner PNG Logo + Dynamic Event Title, Date & Location -->
+    <!-- LEFT: Horizontal Rectangle PNG Logo + Dynamic Event Title, Date & Location -->
     <div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
-      <!-- Left Logo Slot (Direct PNG or Scalable Medallion) -->
-      <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-marine-900 border border-azure/40 p-1 shadow-lg transform -rotate-1 hover:rotate-0 transition flex-shrink-0 flex items-center justify-center overflow-hidden glow-azure">
-        <img id="navLeftLogo" src="" alt="Left Logo" class="w-full h-full object-contain">
+      <!-- Left Logo Slot (Rectangular horizontal badge ~ 160x44px) -->
+      <div class="w-36 sm:w-44 h-11 sm:h-12 rounded-2xl bg-marine-900 border border-azure/40 px-2.5 py-1 shadow-lg hover:border-azure transition flex-shrink-0 flex items-center justify-center overflow-hidden glow-azure">
+        <img id="navLeftLogo" src="" alt="Brand Logo" class="w-full h-full object-contain">
       </div>
       
       <!-- Event Title, Date Badge & Venue Location -->
@@ -229,7 +229,7 @@
       </div>
     </div>
 
-    <!-- RIGHT: Slide Controls, Slides Drawer, Confetti, Admin & Right Logo -->
+    <!-- RIGHT: Slide Controls, Slides Drawer, Confetti, Fullscreen & Admin (Right logo removed) -->
     <div class="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
       
       <!-- Slide Manual Navigation (Strictly NO Numbers) -->
@@ -264,17 +264,11 @@
         <i class="fa-solid fa-sliders text-xs"></i>
         <span class="hidden sm:inline">Admin</span>
       </button>
-
-      <!-- Right Logo Slot (Direct PNG or Scalable Crest) -->
-      <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-marine-900 border border-tealBlue/40 p-1 shadow-lg transform rotate-1 hover:rotate-0 transition flex-shrink-0 flex items-center justify-center overflow-hidden glow-teal">
-        <img id="navRightLogo" src="" alt="Right Logo" class="w-full h-full object-contain">
-      </div>
-
     </div>
   </header>
 
   <!-- ======================================================== -->
-  <!-- FLOATING SLIDE COUNTDOWN TIMER HUD                       -->
+  <!-- FLOATING SLIDE COUNTDOWN TIMER HUD (FOR GENERAL SLIDES)   -->
   <!-- ======================================================== -->
   <div id="slideTimerHUD" class="fixed top-16 right-6 z-40 hidden flex items-center gap-3 bg-marine-950/95 border-2 border-neon-sun rounded-2xl px-4 py-2 shadow-2xl glow-sun backdrop-blur-md">
     <div class="flex items-center gap-2">
@@ -416,7 +410,7 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-marine-950/80 p-4 rounded-2xl border border-azure/20">
             <div>
               <h3 class="font-party text-sm text-azure">Active Presentation Slide Deck</h3>
-              <p class="text-xs font-mono text-slate-400">Click any slide to edit its text, stat stacks, countdown timers, and celebration confetti.</p>
+              <p class="text-xs font-mono text-slate-400">Click any slide to edit its text, rules & regulations, timers, and celebration confetti.</p>
             </div>
             <button onclick="openTemplateSelectorModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-azure via-tealBlue-vibrant to-neon-sun text-black font-party text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg hover:brightness-110 active:scale-95 transition">
               <i class="fa-solid fa-plus"></i> Add New Slide From Template
@@ -547,52 +541,30 @@
         <!-- TAB 4: GLOBAL HEADER & DIRECT PNG DEVICE LOGOS -->
         <div id="tabContentHeader" class="hidden space-y-5">
           <div class="bg-marine-950/80 p-5 rounded-2xl border border-azure/20 space-y-4">
-            <h3 class="font-party text-sm text-azure uppercase">1. Dual Corner PNG Device Logos</h3>
-            <p class="text-xs font-mono text-slate-400">Upload any PNG directly from your computer or phone. Images are automatically optimized so cloud room sync never fails.</p>
+            <h3 class="font-party text-sm text-azure uppercase">1. Horizontal Rectangle Brand Logo</h3>
+            <p class="text-xs font-mono text-slate-400">Upload your organization, team, or sponsor logo directly from your device. Recommended format: horizontal transparent PNG (e.g. 3:1 or 4:1 aspect ratio).</p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
-              <!-- Left Logo Uploader -->
+            <div class="font-mono text-xs max-w-xl">
+              <!-- Left Rectangular Logo Uploader -->
               <div class="bg-marine-950 p-4 rounded-2xl border border-white/10 space-y-3">
                 <div class="flex items-center justify-between">
                   <label class="text-azure font-bold flex items-center gap-1.5">
-                    <i class="fa-solid fa-image"></i> Left Logo (Direct Upload)
+                    <i class="fa-solid fa-image"></i> Brand / Team Logo Banner
                   </label>
-                  <button onclick="resetLogoToDefault('left')" class="text-[10px] text-slate-400 hover:text-white underline">Reset Default</button>
+                  <button onclick="resetLogoToDefault('left')" class="text-[10px] text-slate-400 hover:text-white underline">Reset Default Logo</button>
                 </div>
                 
-                <div class="flex items-center gap-3">
-                  <div class="w-16 h-16 rounded-2xl bg-marine-900 border border-azure/40 p-1 flex items-center justify-center overflow-hidden glow-azure flex-shrink-0">
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                  <!-- Rectangular Preview Box -->
+                  <div class="w-48 h-14 rounded-2xl bg-marine-900 border border-azure/40 px-3 py-1.5 flex items-center justify-center overflow-hidden glow-azure flex-shrink-0">
                     <img id="previewLeftImg" src="" class="w-full h-full object-contain">
                   </div>
-                  <div class="flex-1 space-y-1.5">
-                    <label class="inline-flex items-center gap-2 px-3.5 py-2 bg-marine-800 hover:bg-marine-700 text-azure border border-azure/40 rounded-xl cursor-pointer font-bold text-xs transition">
+                  <div class="flex-1 space-y-1.5 w-full">
+                    <label class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 bg-marine-800 hover:bg-marine-700 text-azure border border-azure/40 rounded-xl cursor-pointer font-bold text-xs transition">
                       <i class="fa-solid fa-folder-open"></i> Choose PNG From Device
                       <input type="file" accept="image/png,image/svg+xml,image/jpeg,image/webp" class="hidden" onchange="handleDirectPngUpload(event, 'left')">
                     </label>
-                    <span id="leftUploadNotice" class="text-[10px] text-slate-400 block">Optimal: transparent PNG logo.</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right Logo Uploader -->
-              <div class="bg-marine-950 p-4 rounded-2xl border border-white/10 space-y-3">
-                <div class="flex items-center justify-between">
-                  <label class="text-tealBlue-mint font-bold flex items-center gap-1.5">
-                    <i class="fa-solid fa-image"></i> Right Logo (Direct Upload)
-                  </label>
-                  <button onclick="resetLogoToDefault('right')" class="text-[10px] text-slate-400 hover:text-white underline">Reset Default</button>
-                </div>
-
-                <div class="flex items-center gap-3">
-                  <div class="w-16 h-16 rounded-2xl bg-marine-900 border border-tealBlue/40 p-1 flex items-center justify-center overflow-hidden glow-teal flex-shrink-0">
-                    <img id="previewRightImg" src="" class="w-full h-full object-contain">
-                  </div>
-                  <div class="flex-1 space-y-1.5">
-                    <label class="inline-flex items-center gap-2 px-3.5 py-2 bg-marine-800 hover:bg-marine-700 text-tealBlue-mint border border-tealBlue/40 rounded-xl cursor-pointer font-bold text-xs transition">
-                      <i class="fa-solid fa-folder-open"></i> Choose PNG From Device
-                      <input type="file" accept="image/png,image/svg+xml,image/jpeg,image/webp" class="hidden" onchange="handleDirectPngUpload(event, 'right')">
-                    </label>
-                    <span id="rightUploadNotice" class="text-[10px] text-slate-400 block">Optimal: transparent PNG logo.</span>
+                    <span id="leftUploadNotice" class="text-[10px] text-slate-400 block">Automatic client-side compression applied.</span>
                   </div>
                 </div>
               </div>
@@ -669,6 +641,16 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 my-4 overflow-y-auto admin-scroll pr-1 font-mono">
+        <!-- NEW DEDICATED TEMPLATE: RULES, REGULATIONS & TIMER -->
+        <button onclick="addSlideFromTemplate('EVENT_RULES_TIMER')" class="text-left bg-marine-950/80 hover:bg-marine-800 border-2 border-neon-sun hover:border-yellow-300 p-4 rounded-2xl transition group flex flex-col justify-between glow-sun">
+          <div>
+            <div class="w-9 h-9 rounded-xl bg-neon-sun/20 text-neon-sun flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">📜</div>
+            <div class="font-party text-sm text-neon-sun">⭐ Event Rules & Countdown Timer</div>
+            <div class="text-[11px] text-slate-200 mt-1">Event Name banner, 4 structured Rule Cards (Conduct, Safety, Scoring, Penalties), and an embedded active timer HUD.</div>
+          </div>
+          <span class="text-[10px] text-neon-sun mt-3 font-bold block">+ Insert Template</span>
+        </button>
+
         <button onclick="addSlideFromTemplate('HERO_WELCOME')" class="text-left bg-marine-950/80 hover:bg-marine-800 border border-azure/40 hover:border-azure p-4 rounded-2xl transition group flex flex-col justify-between">
           <div>
             <div class="w-9 h-9 rounded-xl bg-azure/20 text-azure flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">🌴</div>
@@ -759,11 +741,9 @@
 
   <script>
     /* ========================================================
-       DEFAULT VECTOR/PNG DUMMY LOGOS (CRISP & SCALABLE)
+       DEFAULT RECTANGULAR VECTOR/PNG LOGO (CRISP & HORIZONTAL)
        ======================================================== */
-    const DUMMY_LEFT_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23179EDA"/><stop offset="100%" stop-color="%2306D6A0"/></linearGradient></defs><rect width="100" height="100" rx="28" fill="url(%23g1)"/><path d="M50 18 C32 18 20 32 20 50 C20 68 32 82 50 82 C68 82 80 68 80 50 C80 32 68 18 50 18 Z" fill="%23041525" opacity="0.45"/><path d="M50 28 C45 35 44 48 50 72 M50 36 C40 32 30 38 26 44 M50 44 C38 42 32 50 30 58 M50 36 C60 32 70 38 74 44 M50 44 C62 42 68 50 70 58" stroke="%23FFBE0B" stroke-width="4" stroke-linecap="round" fill="none"/><circle cx="50" cy="30" r="4.5" fill="%23FF006E"/></svg>`;
-
-    const DUMMY_RIGHT_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23FF006E"/><stop offset="100%" stop-color="%23FFBE0B"/></linearGradient></defs><rect width="100" height="100" rx="28" fill="url(%23g2)"/><path d="M50 18 L76 30 L76 56 C76 70 50 82 50 82 C50 82 24 70 24 56 L24 30 Z" fill="%23030C16" opacity="0.5"/><path d="M50 28 L68 38 L68 54 C68 64 50 73 50 73 C50 73 32 64 32 54 L32 38 Z" fill="none" stroke="%23179EDA" stroke-width="3.5"/><polygon points="50,38 54,46 63,47 56,53 58,62 50,57 42,62 44,53 37,47 46,46" fill="%2306D6A0"/></svg>`;
+    const DUMMY_LEFT_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56"><defs><linearGradient id="rectGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23179EDA"/><stop offset="100%" stop-color="%2306D6A0"/></linearGradient></defs><rect width="220" height="56" rx="14" fill="%23041525"/><rect x="2" y="2" width="216" height="52" rx="12" fill="none" stroke="url(%23rectGrad)" stroke-width="2"/><circle cx="28" cy="28" r="14" fill="url(%23rectGrad)"/><path d="M28 18 L32 26 L41 27 L34 33 L36 41 L28 37 L20 41 L22 33 L15 27 L24 26 Z" fill="%23041525"/><text x="52" y="34" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="19" fill="%23FFFFFF" letter-spacing="1">GETTOGETHER</text><circle cx="204" cy="28" r="4" fill="%23FFBE0B"/></svg>`;
 
     /* ========================================================
        DEFAULT DATA STATE, CLOUD CONFIG & PERSISTENCE
@@ -777,7 +757,6 @@
         lat: 15.2993,
         lon: 74.1240,
         navLeftLogo: DUMMY_LEFT_LOGO_SVG,
-        navRightLogo: DUMMY_RIGHT_LOGO_SVG,
         cloudRoomId: "outing-goa-live",
         cloudPollSec: 10,
         lastUpdated: Date.now(),
@@ -811,6 +790,27 @@
           stat3Val: "Coconut Lawn",
           stat4Label: "Sunscreen Factor",
           stat4Val: "SPF 50+"
+        },
+        /* NEW DEFAULT SLIDE: EVENT RULES, REGULATIONS & TIMER */
+        {
+          id: "slide-rules-timer",
+          type: "EVENT_RULES_TIMER",
+          name: "Event Rules & Activity Timer",
+          autoConfetti: true,
+          confettiIntervalSec: 15,
+          timerEnabled: true,
+          timerDurationSec: 600,
+          eventName: "MEGA BEACH TUG-OF-WAR CHAMPIONSHIP",
+          tagline: "Official Outing Protocols, Fair-Play Rules & Live Activity Countdown",
+          badge: "⚡ MANDATORY BRIEFING & PROTOCOLS ⚡",
+          rule1Title: "1. Fair Play & Conduct",
+          rule1Text: "All squad members must rotate. No pulling with wrap-arounds or footing assistance. Keep the banter humorous and friendly!",
+          rule2Title: "2. Sand Arena Safety",
+          rule2Text: "Footwear optional; watch out for shell debris. Hydration mandatory between sets. Medical tent at Gazebo 3 for cramps.",
+          rule3Title: "3. Scoring & Points",
+          rule3Text: "First squad to drag center marker past 2 meters wins the round (+300 pts). Golden whistle decides disputed calls.",
+          rule4Title: "4. Fouls & Penalties",
+          rule4Text: "Early tugging results in a false start warning. Intentional dropping warrants a 30-second penalty dance on the DJ stage!"
         },
         {
           id: "slide-now",
@@ -933,15 +933,12 @@
     function loadData() {
       const roomParam = getURLParam('room');
       try {
-        const stored = localStorage.getItem('team_outing_console_v9');
+        const stored = localStorage.getItem('team_outing_console_v10');
         if (stored) {
           const parsed = JSON.parse(stored);
           if (roomParam) parsed.global.cloudRoomId = roomParam;
-          if (!parsed.global.navLeftLogo || parsed.global.navLeftLogo.includes('unsplash')) {
+          if (!parsed.global.navLeftLogo || parsed.global.navLeftLogo.includes('unsplash') || parsed.global.navLeftLogo.includes('viewBox="0 0 100 100"')) {
             parsed.global.navLeftLogo = DUMMY_LEFT_LOGO_SVG;
-          }
-          if (!parsed.global.navRightLogo || parsed.global.navRightLogo.includes('unsplash')) {
-            parsed.global.navRightLogo = DUMMY_RIGHT_LOGO_SVG;
           }
           return parsed;
         }
@@ -955,7 +952,7 @@
 
     function persistData() {
       consoleData.global.lastUpdated = Date.now();
-      localStorage.setItem('team_outing_console_v9', JSON.stringify(consoleData));
+      localStorage.setItem('team_outing_console_v10', JSON.stringify(consoleData));
     }
 
     /* ========================================================
@@ -1103,7 +1100,7 @@
       persistData();
 
       try {
-        localStorage.setItem('team_outing_broadcast_channel_v9', JSON.stringify({
+        localStorage.setItem('team_outing_broadcast_channel_v10', JSON.stringify({
           timestamp: Date.now(),
           roomId: consoleData.global.cloudRoomId,
           data: consoleData
@@ -1186,7 +1183,7 @@
     }
 
     window.addEventListener('storage', (e) => {
-      if (e.key === 'team_outing_broadcast_channel_v9' && e.newValue) {
+      if (e.key === 'team_outing_broadcast_channel_v10' && e.newValue) {
         try {
           const packet = JSON.parse(e.newValue);
           if (packet.roomId === consoleData.global.cloudRoomId && packet.data) {
@@ -1217,29 +1214,21 @@
       const file = event.target.files[0];
       if (!file) return;
 
-      const noticeEl = document.getElementById(side === 'left' ? 'leftUploadNotice' : 'rightUploadNotice');
+      const noticeEl = document.getElementById('leftUploadNotice');
       if (noticeEl) noticeEl.textContent = "Optimizing image...";
 
       const reader = new FileReader();
       reader.onload = function(e) {
         const rawImg = new Image();
         rawImg.onload = function() {
-          // Scale to max 220x220 to keep Base64 footprint under ~25KB (prevents cloud KV 413 limit)
           const canvas = document.createElement('canvas');
-          const maxDim = 220;
+          const maxDim = 320;
           let w = rawImg.width;
           let h = rawImg.height;
 
-          if (w > h) {
-            if (w > maxDim) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            }
-          } else {
-            if (h > maxDim) {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
+          if (w > maxDim) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
           }
 
           canvas.width = w;
@@ -1250,15 +1239,11 @@
 
           const compressedBase64 = canvas.toDataURL('image/png');
 
-          if (side === 'left') {
-            consoleData.global.navLeftLogo = compressedBase64;
-            document.getElementById('previewLeftImg').src = compressedBase64;
-            document.getElementById('navLeftLogo').src = compressedBase64;
-          } else {
-            consoleData.global.navRightLogo = compressedBase64;
-            document.getElementById('previewRightImg').src = compressedBase64;
-            document.getElementById('navRightLogo').src = compressedBase64;
-          }
+          consoleData.global.navLeftLogo = compressedBase64;
+          const preview = document.getElementById('previewLeftImg');
+          const navImg = document.getElementById('navLeftLogo');
+          if (preview) preview.src = compressedBase64;
+          if (navImg) navImg.src = compressedBase64;
 
           persistData();
           if (noticeEl) noticeEl.textContent = `Uploaded & optimized (${Math.round(compressedBase64.length / 1024)} KB) ✓`;
@@ -1269,24 +1254,18 @@
     }
 
     function resetLogoToDefault(side) {
-      if (side === 'left') {
-        consoleData.global.navLeftLogo = DUMMY_LEFT_LOGO_SVG;
-        document.getElementById('previewLeftImg').src = DUMMY_LEFT_LOGO_SVG;
-        document.getElementById('navLeftLogo').src = DUMMY_LEFT_LOGO_SVG;
-        const noticeEl = document.getElementById('leftUploadNotice');
-        if (noticeEl) noticeEl.textContent = "Reset to default badge.";
-      } else {
-        consoleData.global.navRightLogo = DUMMY_RIGHT_LOGO_SVG;
-        document.getElementById('previewRightImg').src = DUMMY_RIGHT_LOGO_SVG;
-        document.getElementById('navRightLogo').src = DUMMY_RIGHT_LOGO_SVG;
-        const noticeEl = document.getElementById('rightUploadNotice');
-        if (noticeEl) noticeEl.textContent = "Reset to default badge.";
-      }
+      consoleData.global.navLeftLogo = DUMMY_LEFT_LOGO_SVG;
+      const preview = document.getElementById('previewLeftImg');
+      const navImg = document.getElementById('navLeftLogo');
+      if (preview) preview.src = DUMMY_LEFT_LOGO_SVG;
+      if (navImg) navImg.src = DUMMY_LEFT_LOGO_SVG;
+      const noticeEl = document.getElementById('leftUploadNotice');
+      if (noticeEl) noticeEl.textContent = "Reset to default horizontal badge.";
       persistData();
     }
 
     /* ========================================================
-       SLIDE COUNTDOWN TIMER ENGINE (START / PAUSE / RESET)
+       SLIDE COUNTDOWN TIMER ENGINE (SUPPORTS FLOATING & EMBEDDED)
        ======================================================== */
     function setupSlideTimerHUD() {
       if (slideTimerInterval) {
@@ -1306,7 +1285,13 @@
       slideTimerRemaining = activeSlide.timerDurationSec || 300;
       updateTimerDigitsDisplay();
       updateTimerControlsUI();
-      timerHUD.classList.remove('hidden');
+
+      // If the active slide has its own embedded in-card timer, hide the floating one to prevent duplicates
+      if (activeSlide.type === 'EVENT_RULES_TIMER') {
+        timerHUD.classList.add('hidden');
+      } else {
+        timerHUD.classList.remove('hidden');
+      }
     }
 
     function toggleSlideTimer() {
@@ -1353,21 +1338,50 @@
       const minutes = Math.floor(slideTimerRemaining / 60);
       const seconds = slideTimerRemaining % 60;
       const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      
+      // Update top floating HUD
       const digitsEl = document.getElementById('timerDigitsDisplay');
       if (digitsEl) digitsEl.textContent = formatted;
+
+      // Update in-slide embedded timer HUD (for EVENT_RULES_TIMER slide)
+      const embeddedDigits = document.getElementById('embeddedRulesTimerDigits');
+      if (embeddedDigits) embeddedDigits.textContent = formatted;
+
+      const embeddedProgress = document.getElementById('embeddedRulesTimerProgress');
+      if (embeddedProgress) {
+        const activeSlide = consoleData.slides[currentSlideIndex];
+        const total = (activeSlide && activeSlide.timerDurationSec) ? activeSlide.timerDurationSec : 600;
+        const pct = Math.max(0, Math.min(100, Math.round((slideTimerRemaining / total) * 100)));
+        embeddedProgress.style.width = `${pct}%`;
+      }
     }
 
     function updateTimerControlsUI() {
       const btn = document.getElementById('btnTimerStartPause');
       const icon = document.getElementById('timerIconState');
-      if (!btn || !icon) return;
+      if (btn && icon) {
+        if (slideTimerIsRunning) {
+          icon.className = "fa-solid fa-pause";
+          btn.className = "w-7 h-7 rounded-xl bg-neon-coral text-white flex items-center justify-center text-xs font-bold transition active:scale-90";
+        } else {
+          icon.className = "fa-solid fa-play";
+          btn.className = "w-7 h-7 rounded-xl bg-neon-sun text-black flex items-center justify-center text-xs font-bold transition active:scale-90";
+        }
+      }
 
-      if (slideTimerIsRunning) {
-        icon.className = "fa-solid fa-pause";
-        btn.className = "w-7 h-7 rounded-xl bg-neon-coral text-white flex items-center justify-center text-xs font-bold transition active:scale-90";
-      } else {
-        icon.className = "fa-solid fa-play";
-        btn.className = "w-7 h-7 rounded-xl bg-neon-sun text-black flex items-center justify-center text-xs font-bold transition active:scale-90";
+      // Update embedded slide timer controls
+      const embBtn = document.getElementById('embeddedTimerBtnStart');
+      const embIcon = document.getElementById('embeddedTimerIcon');
+      if (embBtn && embIcon) {
+        if (slideTimerIsRunning) {
+          embIcon.className = "fa-solid fa-pause";
+          embBtn.className = "px-4 py-2 rounded-xl bg-neon-coral hover:bg-rose-500 text-white font-party text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md active:scale-95 transition";
+          embBtn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause Timer`;
+        } else {
+          embIcon.className = "fa-solid fa-play";
+          embBtn.className = "px-4 py-2 rounded-xl bg-neon-sun hover:bg-yellow-400 text-black font-party text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md active:scale-95 transition";
+          embBtn.innerHTML = `<i class="fa-solid fa-play"></i> Start Timer`;
+        }
       }
     }
 
@@ -1429,6 +1443,7 @@
         }`;
         
         let typeBadgeColor = "text-azure bg-azure/10 border-azure/30";
+        if (slide.type === 'EVENT_RULES_TIMER') typeBadgeColor = "text-neon-sun bg-neon-sun/10 border-neon-sun/30";
         if (slide.type === 'NOW_OPS') typeBadgeColor = "text-neon-coral bg-neon-coral/10 border-neon-coral/30";
         if (slide.type === 'LEADERBOARD') typeBadgeColor = "text-tealBlue-mint bg-tealBlue/10 border-tealBlue/30";
         if (slide.type === 'TIMELINE') typeBadgeColor = "text-neon-mint bg-neon-mint/10 border-neon-mint/30";
@@ -1445,7 +1460,7 @@
               ${isActive ? '<span class="px-2 py-0.5 rounded-full bg-azure text-black text-[9px] font-bold">CURRENT</span>' : ''}
             </div>
             <div class="text-[11px] text-slate-300 truncate">
-              ${slide.title || slide.headline || 'Slide'}
+              ${slide.eventName || slide.title || slide.headline || 'Slide'}
             </div>
           </div>
           <div class="flex items-center justify-between mt-3 pt-2 border-t border-white/10">
@@ -1558,6 +1573,9 @@
         slideEl.className = `slide-card ${idx === currentSlideIndex ? 'active-slide' : ''}`;
         
         switch (slide.type) {
+          case 'EVENT_RULES_TIMER':
+            slideEl.innerHTML = renderRulesAndTimerTemplate(slide);
+            break;
           case 'HERO_WELCOME':
             slideEl.innerHTML = renderHeroTemplate(slide);
             break;
@@ -1586,6 +1604,173 @@
       updateActiveSlideDisplay();
       setupSlideConfettiInterval();
       setupSlideTimerHUD();
+    }
+
+    /* ========================================================
+       NEW TEMPLATE: EVENT NAME, RULES & REGULATIONS, WITH TIMER
+       ======================================================== */
+    function renderRulesAndTimerTemplate(s) {
+      const minutes = Math.floor((slideTimerRemaining || s.timerDurationSec || 600) / 60);
+      const seconds = (slideTimerRemaining || s.timerDurationSec || 600) % 60;
+      const initialDigits = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+      return `
+        <div class="h-full flex flex-col justify-between py-1">
+          <!-- Top Masthead: Badge, Event Name & Tagline -->
+          <div class="border-b border-white/10 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-neon-sun/20 text-neon-sun border border-neon-sun/40 font-mono text-[11px] font-bold tracking-wider uppercase">
+                <i class="fa-solid fa-scroll text-[10px]"></i> ${s.badge || '⚡ MANDATORY BRIEFING & PROTOCOLS ⚡'}
+              </span>
+              <h2 class="text-xl sm:text-3xl lg:text-4xl font-party tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-neon-sun via-white to-azure truncate mt-1">
+                ${s.eventName || 'EVENT RULES & REGULATIONS'}
+              </h2>
+              <p class="text-xs sm:text-sm font-display text-tealBlue-mint font-semibold mt-0.5">
+                ${s.tagline || 'Official Outing Guidelines, Fair-Play Rules & Live Activity Countdown'}
+              </p>
+            </div>
+            
+            <button onclick="blastConfetti(true)" class="px-3.5 py-1.5 rounded-xl bg-marine-800 hover:bg-marine-700 text-azure border border-azure/40 font-mono text-xs font-bold flex items-center gap-1.5 transition self-start sm:self-center">
+              <i class="fa-solid fa-bullhorn text-neon-coral"></i> Acknowledge Rules
+            </button>
+          </div>
+
+          <!-- Main Body: 4 High-Contrast Rules Cards (Left) + Integrated Timer Deck (Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 my-auto items-stretch">
+            
+            <!-- Rules & Regulations Grid (4 Structured Cards) -->
+            <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              
+              <!-- Rule Card 1 -->
+              <div class="glass-card p-4 rounded-3xl border-l-4 border-l-azure border-t border-r border-b border-azure/30 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="font-party text-sm text-azure flex items-center gap-2">
+                      <i class="fa-solid fa-handshake-angle"></i> ${s.rule1Title || '1. Fair Play & Conduct'}
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full bg-azure/20 text-azure text-[9px] font-mono font-bold">ETHICS</span>
+                  </div>
+                  <p class="text-xs text-slate-200 leading-relaxed font-sans">
+                    ${s.rule1Text || 'All squad members must participate. Zero tolerance for unsportsmanlike behavior.'}
+                  </p>
+                </div>
+                <div class="text-[10px] font-mono text-slate-400 mt-3 pt-2 border-t border-white/10 flex items-center gap-1.5">
+                  <i class="fa-solid fa-check text-neon-mint text-[9px]"></i> Binding on all squads
+                </div>
+              </div>
+
+              <!-- Rule Card 2 -->
+              <div class="glass-card p-4 rounded-3xl border-l-4 border-l-tealBlue-mint border-t border-r border-b border-tealBlue/30 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="font-party text-sm text-tealBlue-mint flex items-center gap-2">
+                      <i class="fa-solid fa-shield-halved"></i> ${s.rule2Title || '2. Safety & Boundaries'}
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full bg-tealBlue/20 text-tealBlue-mint text-[9px] font-mono font-bold">SAFETY</span>
+                  </div>
+                  <p class="text-xs text-slate-200 leading-relaxed font-sans">
+                    ${s.rule2Text || 'Respect referee boundaries. Stay hydrated at official water stations between sets.'}
+                  </p>
+                </div>
+                <div class="text-[10px] font-mono text-slate-400 mt-3 pt-2 border-t border-white/10 flex items-center gap-1.5">
+                  <i class="fa-solid fa-kit-medical text-neon-coral text-[9px]"></i> First-Aid on standby
+                </div>
+              </div>
+
+              <!-- Rule Card 3 -->
+              <div class="glass-card p-4 rounded-3xl border-l-4 border-l-neon-sun border-t border-r border-b border-neon-sun/30 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="font-party text-sm text-neon-sun flex items-center gap-2">
+                      <i class="fa-solid fa-award"></i> ${s.rule3Title || '3. Scoring & Referee Calls'}
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full bg-neon-sun/20 text-neon-sun text-[9px] font-mono font-bold">POINTS</span>
+                  </div>
+                  <p class="text-xs text-slate-200 leading-relaxed font-sans">
+                    ${s.rule3Text || 'Official whistle call is final. Extra bonus points rewarded for squad teamwork & cheering.'}
+                  </p>
+                </div>
+                <div class="text-[10px] font-mono text-slate-400 mt-3 pt-2 border-t border-white/10 flex items-center gap-1.5">
+                  <i class="fa-solid fa-trophy text-neon-sun text-[9px]"></i> +300 Point Max Bounty
+                </div>
+              </div>
+
+              <!-- Rule Card 4 -->
+              <div class="glass-card p-4 rounded-3xl border-l-4 border-l-neon-coral border-t border-r border-b border-neon-coral/30 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="font-party text-sm text-neon-coral flex items-center gap-2">
+                      <i class="fa-solid fa-triangle-exclamation"></i> ${s.rule4Title || '4. Fouls & Penalties'}
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full bg-neon-coral/20 text-neon-coral text-[9px] font-mono font-bold">PENALTIES</span>
+                  </div>
+                  <p class="text-xs text-slate-200 leading-relaxed font-sans">
+                    ${s.rule4Text || 'Violations result in 30-second penalty dance or mascot duty on the center stage.'}
+                  </p>
+                </div>
+                <div class="text-[10px] font-mono text-slate-400 mt-3 pt-2 border-t border-white/10 flex items-center gap-1.5">
+                  <i class="fa-solid fa-gavel text-neon-coral text-[9px]"></i> Court ruled by organizers
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Integrated Embedded Countdown Timer Deck (Right) -->
+            <div class="lg:col-span-4 bg-gradient-to-br from-marine-900/90 via-marine-950 to-marine-900 border-2 border-neon-sun rounded-3xl p-5 flex flex-col justify-between glow-sun backdrop-blur shadow-2xl">
+              <div>
+                <div class="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
+                  <span class="font-party text-xs uppercase text-neon-sun flex items-center gap-1.5">
+                    <i class="fa-solid fa-stopwatch animate-pulse"></i> LIVE EVENT TIMER
+                  </span>
+                  <span class="px-2 py-0.5 rounded-full bg-neon-sun/20 text-neon-sun font-mono text-[10px] font-bold">
+                    OFFICIAL CLOCK
+                  </span>
+                </div>
+
+                <div class="text-center my-3">
+                  <div id="embeddedRulesTimerDigits" class="font-mono text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-neon-sun to-yellow-200 tracking-wider drop-shadow-lg">
+                    ${initialDigits}
+                  </div>
+                  <div class="text-[11px] font-mono uppercase tracking-widest text-slate-400 mt-1">
+                    Activity Duration Remaining
+                  </div>
+                </div>
+
+                <!-- Live Animated Progress Bar -->
+                <div class="w-full bg-marine-950 h-3.5 rounded-full p-0.5 border border-white/10 overflow-hidden my-3">
+                  <div id="embeddedRulesTimerProgress" class="h-full bg-gradient-to-r from-neon-coral via-neon-sun to-neon-mint rounded-full transition-all duration-300" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <!-- Interactive Controls (Start, Pause, Reset, Confetti) -->
+              <div class="space-y-2 mt-2">
+                <div class="flex items-center gap-2">
+                  <button id="embeddedTimerBtnStart" onclick="toggleSlideTimer()" class="flex-1 py-2.5 rounded-xl bg-neon-sun hover:bg-yellow-400 text-black font-party text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
+                    <i id="embeddedTimerIcon" class="fa-solid fa-play"></i> Start Timer
+                  </button>
+                  <button onclick="resetSlideTimer()" class="px-3.5 py-2.5 rounded-xl bg-marine-800 hover:bg-marine-700 text-slate-200 border border-white/20 font-party text-xs uppercase active:scale-95 transition" title="Reset to Start">
+                    <i class="fa-solid fa-rotate-left"></i>
+                  </button>
+                </div>
+                
+                <div class="bg-marine-950/80 p-2.5 rounded-xl border border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-300">
+                  <span class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-bell text-neon-sun text-[10px]"></i> On 00:00:
+                  </span>
+                  <span class="font-bold text-neon-mint">Party Horn & Confetti 🎉</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Bottom Footer Notice -->
+          <div class="text-center font-mono text-[11px] text-slate-400">
+            Rules and timers are fully editable in the Admin Console • Spacebar blasts celebration confetti
+          </div>
+        </div>
+      `;
     }
 
     /* Template 1: Hero Welcome (ALL 4 STATS FULLY DISPLAYED, NO NUMBERS) */
@@ -1934,53 +2119,48 @@
               <span class="text-xs font-mono text-neon-coral uppercase font-bold tracking-widest block">${s.subtitle || 'Safety First'}</span>
               <h2 class="text-xl sm:text-2xl font-party text-white">${s.title}</h2>
             </div>
-            <span class="text-xs font-mono bg-neon-sun/20 text-neon-sun px-3 py-1 rounded-full border border-neon-sun/40">
-              Medical Tent: Palm Pavilion
-            </span>
+            <div class="font-mono text-xs text-slate-300 bg-marine-900 px-3 py-1 rounded-full border border-white/10">
+              ${s.medicalNote || 'First Aid: Gazebo 3'}
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 my-auto">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-auto">
             ${cards}
           </div>
 
-          <div class="bg-marine-950/80 p-2.5 rounded-2xl border border-neon-mint/30 text-center font-mono text-xs text-neon-mint">
-            ${s.medicalNote || 'First Aid available at Gazebo 3'}
+          <div class="text-center font-mono text-[11px] text-slate-400">
+            Enjoy responsibly • Respect resort team & nature
           </div>
         </div>
       `;
     }
 
-    /* ========================================================
-       LIVE WEATHER API (Open-Meteo) & HEADER
-       ======================================================== */
     async function syncWeather() {
       const g = consoleData.global;
-      const lat = g.lat || 15.2993;
-      const lon = g.lon || 74.1240;
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto`;
-
       try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${g.lat || 15.2993}&longitude=${g.lon || 74.1240}&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto`;
         const res = await fetch(url);
-        if (!res.ok) throw new Error("Weather API did not respond");
-        const json = await res.json();
-        if (json && json.current) {
-          const temp = Math.round(json.current.temperature_2m);
-          const wind = Math.round(json.current.wind_speed_10m);
-          const code = json.current.weather_code;
-
+        if (res.ok) {
+          const data = await res.json();
+          const temp = Math.round(data.current.temperature_2m);
           document.getElementById('weatherTemp').textContent = `${temp}°C`;
           document.getElementById('weatherCity').textContent = g.cityWeatherLabel || "Resort";
-
-          let condition = "Sunny Beach Day";
+          
+          const code = data.current.weather_code;
+          let cond = "Clear Sun 🌴";
           let icon = "fa-solid fa-sun text-neon-sun";
-
-          if (code === 0) { condition = "Clear Skies"; icon = "fa-solid fa-sun text-neon-sun"; }
-          else if ([1, 2, 3].includes(code)) { condition = "Tropical Sun"; icon = "fa-solid fa-cloud-sun text-neon-sun"; }
-          else if ([51, 61, 80].includes(code)) { condition = "Warm Sprinkles"; icon = "fa-solid fa-cloud-rain text-azure"; }
-          else { condition = `Breezy (${wind} km/h)`; icon = "fa-solid fa-wind text-tealBlue-mint"; }
-
-          document.getElementById('weatherCondition').textContent = condition;
+          if (code >= 1 && code <= 3) { cond = "Partly Cloudy ⛅"; icon = "fa-solid fa-cloud-sun text-yellow-300"; }
+          else if (code >= 45 && code <= 48) { cond = "Misty Breeze 🌫️"; icon = "fa-solid fa-smog text-cyan-300"; }
+          else if (code >= 51 && code <= 67) { cond = "Light Drizzle 🌦️"; icon = "fa-solid fa-cloud-rain text-cyan-400"; }
+          else if (code >= 71) { cond = "Showers 🌧️"; icon = "fa-solid fa-cloud-showers-heavy text-azure"; }
+          
+          document.getElementById('weatherCondition').textContent = cond;
           document.getElementById('weatherIcon').className = icon;
+        } else {
+          document.getElementById('weatherTemp').textContent = "29°C";
+          document.getElementById('weatherCity').textContent = g.cityWeatherLabel || "Goa Beach";
+          document.getElementById('weatherCondition').textContent = "Tropical Sun 🌴";
+          document.getElementById('weatherIcon').className = "fa-solid fa-sun text-neon-sun";
         }
       } catch (err) {
         document.getElementById('weatherTemp').textContent = "29°C";
@@ -1990,6 +2170,54 @@
       }
     }
 
+    function updateDigitalClock() {
+      const clockEl = document.getElementById('clockDisplay');
+      if (!clockEl) return;
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const secs = String(now.getSeconds()).padStart(2, '0');
+      clockEl.textContent = `${hrs}:${mins}:${secs}`;
+    }
+
+    function openAdmin() {
+      populateAdminFields();
+      renderAdminSlideList();
+      renderAdminScheduleList();
+      updateDisplayUrlBox();
+      const drawer = document.getElementById('adminDrawer');
+      if (drawer) drawer.classList.remove('hidden');
+    }
+
+    function closeAdmin() {
+      const drawer = document.getElementById('adminDrawer');
+      if (drawer) drawer.classList.add('hidden');
+    }
+
+    function switchAdminTab(tabKey) {
+      const tabs = ['slides', 'system', 'schedule', 'header'];
+      tabs.forEach(t => {
+        const capitalized = t.charAt(0).toUpperCase() + t.slice(1);
+        const btn = document.getElementById(`tabBtn${capitalized}`);
+        const content = document.getElementById(`tabContent${capitalized}`);
+
+        if (btn) {
+          if (t === tabKey) {
+            btn.className = "py-3 px-4 border-b-2 border-azure font-bold text-azure flex items-center gap-2 flex-shrink-0";
+          } else {
+            btn.className = "py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0";
+          }
+        }
+        if (content) {
+          if (t === tabKey) {
+            content.classList.remove('hidden');
+          } else {
+            content.classList.add('hidden');
+          }
+        }
+      });
+    }
+
     function renderGlobalHeader() {
       const g = consoleData.global;
       document.getElementById('navEventTitle').textContent = g.eventTitle;
@@ -1997,66 +2225,16 @@
       document.getElementById('navVenueText').textContent = g.venueText;
 
       const leftImg = document.getElementById('navLeftLogo');
-      const rightImg = document.getElementById('navRightLogo');
-
-      leftImg.src = g.navLeftLogo || DUMMY_LEFT_LOGO_SVG;
-      rightImg.src = g.navRightLogo || DUMMY_RIGHT_LOGO_SVG;
-
-      leftImg.onerror = () => { leftImg.src = DUMMY_LEFT_LOGO_SVG; };
-      rightImg.onerror = () => { rightImg.src = DUMMY_RIGHT_LOGO_SVG; };
-    }
-
-    function updateDigitalClock() {
-      const now = new Date();
-      document.getElementById('clockDisplay').textContent = now.toLocaleTimeString();
-    }
-
-    /* ========================================================
-       ADMIN STUDIO DRAWER CONTROLLER
-       ======================================================== */
-    function openAdmin() {
-      populateAdminFields();
-      renderAdminSlideList();
-      renderAdminScheduleList();
-      updateDisplayUrlBox();
-      document.getElementById('adminDrawer').classList.remove('hidden');
-    }
-
-    function closeAdmin() {
-      document.getElementById('adminDrawer').classList.add('hidden');
-    }
-
-    function switchAdminTab(tab) {
-      document.getElementById('tabContentSlides').classList.add('hidden');
-      document.getElementById('tabContentSystem').classList.add('hidden');
-      document.getElementById('tabContentSchedule').classList.add('hidden');
-      document.getElementById('tabContentHeader').classList.add('hidden');
-
-      document.getElementById('tabBtnSlides').className = "py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0";
-      document.getElementById('tabBtnSystem').className = "py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0";
-      document.getElementById('tabBtnSchedule').className = "py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0";
-      document.getElementById('tabBtnHeader').className = "py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 flex-shrink-0";
-
-      if (tab === 'slides') {
-        document.getElementById('tabContentSlides').classList.remove('hidden');
-        document.getElementById('tabBtnSlides').className = "py-3 px-4 border-b-2 border-azure font-bold text-azure flex items-center gap-2 flex-shrink-0";
-      } else if (tab === 'system') {
-        document.getElementById('tabContentSystem').classList.remove('hidden');
-        document.getElementById('tabBtnSystem').className = "py-3 px-4 border-b-2 border-emerald-400 font-bold text-emerald-400 flex items-center gap-2 flex-shrink-0";
-        updateDisplayUrlBox();
-      } else if (tab === 'schedule') {
-        document.getElementById('tabContentSchedule').classList.remove('hidden');
-        document.getElementById('tabBtnSchedule').className = "py-3 px-4 border-b-2 border-neon-sun font-bold text-neon-sun flex items-center gap-2 flex-shrink-0";
-      } else if (tab === 'header') {
-        document.getElementById('tabContentHeader').classList.remove('hidden');
-        document.getElementById('tabBtnHeader').className = "py-3 px-4 border-b-2 border-tealBlue-mint font-bold text-tealBlue-mint flex items-center gap-2 flex-shrink-0";
+      if (leftImg) {
+        leftImg.src = g.navLeftLogo || DUMMY_LEFT_LOGO_SVG;
+        leftImg.onerror = () => { leftImg.src = DUMMY_LEFT_LOGO_SVG; };
       }
     }
 
     function populateAdminFields() {
       const g = consoleData.global;
-      document.getElementById('previewLeftImg').src = g.navLeftLogo || DUMMY_LEFT_LOGO_SVG;
-      document.getElementById('previewRightImg').src = g.navRightLogo || DUMMY_RIGHT_LOGO_SVG;
+      const previewLeft = document.getElementById('previewLeftImg');
+      if (previewLeft) previewLeft.src = g.navLeftLogo || DUMMY_LEFT_LOGO_SVG;
 
       document.getElementById('cfgNavTitle').value = g.eventTitle;
       document.getElementById('cfgNavEventDate').value = g.eventDate || "Oct 15, 2026";
@@ -2078,6 +2256,7 @@
         item.className = "p-3.5 bg-marine-950/80 border border-azure/20 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono text-xs";
         
         let typeBadgeColor = "text-azure bg-azure/10 border-azure/30";
+        if (slide.type === 'EVENT_RULES_TIMER') typeBadgeColor = "text-neon-sun bg-neon-sun/10 border-neon-sun/30 font-bold";
         if (slide.type === 'NOW_OPS') typeBadgeColor = "text-neon-coral bg-neon-coral/10 border-neon-coral/30";
         if (slide.type === 'LEADERBOARD') typeBadgeColor = "text-tealBlue-mint bg-tealBlue/10 border-tealBlue/30";
         if (slide.type === 'TIMELINE') typeBadgeColor = "text-neon-mint bg-neon-mint/10 border-neon-mint/30";
@@ -2095,7 +2274,7 @@
                 ${slide.timerEnabled ? '<span class="px-2 py-0.5 rounded-full bg-neon-coral/20 text-neon-coral border border-neon-coral/40 text-[9px]">⏱️ Timer (' + Math.round(slide.timerDurationSec / 60) + 'm)</span>' : ''}
               </div>
               <div class="text-[10px] text-slate-400 truncate max-w-sm mt-0.5">
-                ${slide.title || slide.headline || 'Presentation Slide'}
+                ${slide.eventName || slide.title || slide.headline || 'Presentation Slide'}
               </div>
             </div>
           </div>
@@ -2169,7 +2348,26 @@
       let newSlide = null;
       const id = "slide-" + Date.now();
 
-      if (type === 'HERO_WELCOME') {
+      if (type === 'EVENT_RULES_TIMER') {
+        newSlide = {
+          id, type, name: "Event Rules & Activity Timer",
+          autoConfetti: true,
+          confettiIntervalSec: 15,
+          timerEnabled: true,
+          timerDurationSec: 600,
+          eventName: "MEGA BEACH TUG-OF-WAR CHAMPIONSHIP",
+          tagline: "Official Outing Protocols, Fair-Play Rules & Live Activity Countdown",
+          badge: "⚡ MANDATORY BRIEFING & PROTOCOLS ⚡",
+          rule1Title: "1. Fair Play & Conduct",
+          rule1Text: "All squad members must rotate. No pulling with wrap-arounds or footing assistance. Keep the banter humorous and friendly!",
+          rule2Title: "2. Sand Arena Safety",
+          rule2Text: "Footwear optional; watch out for shell debris. Hydration mandatory between sets. Medical tent at Gazebo 3 for cramps.",
+          rule3Title: "3. Scoring & Points",
+          rule3Text: "First squad to drag center marker past 2 meters wins the round (+300 pts). Golden whistle decides disputed calls.",
+          rule4Title: "4. Fouls & Penalties",
+          rule4Text: "Early tugging results in a false start warning. Intentional dropping warrants a 30-second penalty dance on the DJ stage!"
+        };
+      } else if (type === 'HERO_WELCOME') {
         newSlide = {
           id, type, name: "Welcome Hero",
           autoConfetti: true,
@@ -2326,7 +2524,7 @@
     }
 
     /* ========================================================
-       SLIDE FIELD EDITOR MODAL (STATS 1-4 FULLY EDITABLE)
+       SLIDE FIELD EDITOR MODAL (EVENT RULES & TIMER SUPPORT)
        ======================================================== */
     function openSlideEditModal(idx) {
       currentlyEditingSlideIndex = idx;
@@ -2357,24 +2555,78 @@
           </div>
         </div>
 
-        <!-- PER-SLIDE COUNTDOWN TIMER CONFIGURATION -->
+        <!-- COUNTDOWN TIMER CONFIGURATION -->
         <div class="bg-marine-950/80 p-3.5 rounded-2xl border border-neon-sun/30 space-y-2">
-          <label class="block text-neon-sun font-bold">⏱️ Slide Countdown Timer HUD</label>
+          <label class="block text-neon-sun font-bold">⏱️ Slide Countdown Timer Duration</label>
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <label class="inline-flex items-center gap-2 cursor-pointer">
               <input id="editTimerEnabled" type="checkbox" ${slide.timerEnabled ? 'checked' : ''} class="w-4 h-4 rounded text-neon-sun accent-yellow-400">
-              <span class="text-white">Show on-screen timer HUD during this slide</span>
+              <span class="text-white">Enable interactive timer for this slide</span>
             </label>
             <div class="flex items-center gap-2 text-slate-300">
               <span>Duration:</span>
-              <input id="editTimerDurationSec" type="number" min="10" max="7200" step="10" value="${slide.timerDurationSec || 300}" class="w-20 bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-neon-sun font-bold outline-none focus:border-neon-sun">
-              <span>seconds (${Math.round((slide.timerDurationSec || 300)/60)} min)</span>
+              <input id="editTimerDurationSec" type="number" min="10" max="7200" step="10" value="${slide.timerDurationSec || 600}" class="w-20 bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-neon-sun font-bold outline-none focus:border-neon-sun">
+              <span>seconds (${Math.round((slide.timerDurationSec || 600)/60)} min)</span>
             </div>
           </div>
         </div>
       `;
 
-      if (slide.type === 'HERO_WELCOME') {
+      if (slide.type === 'EVENT_RULES_TIMER') {
+        container.innerHTML += `
+          <!-- EVENT NAME, BADGE & TAGLINE -->
+          <div class="space-y-2 bg-marine-950 p-3.5 rounded-2xl border border-neon-sun/30">
+            <label class="block text-neon-sun font-bold text-xs uppercase">Event Name & Masthead Tagline</label>
+            <div>
+              <span class="text-slate-400 text-[10px] block mb-0.5">Top Banner Badge</span>
+              <input id="editRulesBadge" type="text" value="${slide.badge || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-xl px-3 py-1.5 text-white font-bold">
+            </div>
+            <div>
+              <span class="text-slate-400 text-[10px] block mb-0.5">Event Name (Prominent Title)</span>
+              <input id="editRulesEventName" type="text" value="${slide.eventName || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-xl px-3 py-1.5 text-neon-sun font-party text-sm">
+            </div>
+            <div>
+              <span class="text-slate-400 text-[10px] block mb-0.5">Event Subtitle / Tagline</span>
+              <input id="editRulesTagline" type="text" value="${slide.tagline || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-xl px-3 py-1.5 text-tealBlue-mint font-semibold">
+            </div>
+          </div>
+
+          <!-- 4 EDITABLE RULES & REGULATIONS CARDS -->
+          <div class="border-t border-white/10 pt-2 space-y-3">
+            <span class="font-bold text-azure text-xs uppercase tracking-wider block">Configure 4 Rules & Regulations Cards:</span>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Rule 1 -->
+              <div class="bg-marine-950 p-3 rounded-xl border border-azure/40">
+                <span class="text-azure font-bold block mb-1">Rule Card 1</span>
+                <input id="editR1Title" type="text" placeholder="Title" value="${slide.rule1Title || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-white mb-1.5 font-bold">
+                <textarea id="editR1Text" rows="2" placeholder="Description" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 text-xs">${slide.rule1Text || ''}</textarea>
+              </div>
+
+              <!-- Rule 2 -->
+              <div class="bg-marine-950 p-3 rounded-xl border border-tealBlue-mint/40">
+                <span class="text-tealBlue-mint font-bold block mb-1">Rule Card 2</span>
+                <input id="editR2Title" type="text" placeholder="Title" value="${slide.rule2Title || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-white mb-1.5 font-bold">
+                <textarea id="editR2Text" rows="2" placeholder="Description" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 text-xs">${slide.rule2Text || ''}</textarea>
+              </div>
+
+              <!-- Rule 3 -->
+              <div class="bg-marine-950 p-3 rounded-xl border border-neon-sun/40">
+                <span class="text-neon-sun font-bold block mb-1">Rule Card 3</span>
+                <input id="editR3Title" type="text" placeholder="Title" value="${slide.rule3Title || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-white mb-1.5 font-bold">
+                <textarea id="editR3Text" rows="2" placeholder="Description" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 text-xs">${slide.rule3Text || ''}</textarea>
+              </div>
+
+              <!-- Rule 4 -->
+              <div class="bg-marine-950 p-3 rounded-xl border border-neon-coral/40">
+                <span class="text-neon-coral font-bold block mb-1">Rule Card 4</span>
+                <input id="editR4Title" type="text" placeholder="Title" value="${slide.rule4Title || ''}" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-white mb-1.5 font-bold">
+                <textarea id="editR4Text" rows="2" placeholder="Description" class="w-full bg-marine-900 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 text-xs">${slide.rule4Text || ''}</textarea>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (slide.type === 'HERO_WELCOME') {
         container.innerHTML += `
           <div class="space-y-1">
             <label class="block text-slate-400 font-bold">Top Pill / Badge</label>
@@ -2518,7 +2770,21 @@
       slide.timerEnabled = document.getElementById('editTimerEnabled').checked;
       slide.timerDurationSec = parseInt(document.getElementById('editTimerDurationSec').value, 10) || 300;
 
-      if (slide.type === 'HERO_WELCOME') {
+      if (slide.type === 'EVENT_RULES_TIMER') {
+        slide.badge = document.getElementById('editRulesBadge').value.trim();
+        slide.eventName = document.getElementById('editRulesEventName').value.trim();
+        slide.tagline = document.getElementById('editRulesTagline').value.trim();
+        
+        slide.rule1Title = document.getElementById('editR1Title').value.trim();
+        slide.rule1Text = document.getElementById('editR1Text').value.trim();
+        slide.rule2Title = document.getElementById('editR2Title').value.trim();
+        slide.rule2Text = document.getElementById('editR2Text').value.trim();
+        slide.rule3Title = document.getElementById('editR3Title').value.trim();
+        slide.rule3Text = document.getElementById('editR3Text').value.trim();
+        slide.rule4Title = document.getElementById('editR4Title').value.trim();
+        slide.rule4Text = document.getElementById('editR4Text').value.trim();
+
+      } else if (slide.type === 'HERO_WELCOME') {
         slide.badge = document.getElementById('editHeroBadge').value.trim();
         slide.headline = document.getElementById('editHeroHeadline').value.trim();
         slide.subhead = document.getElementById('editHeroSubhead').value.trim();
@@ -2628,7 +2894,7 @@
     }
 
     function resetDefaults() {
-      localStorage.removeItem('team_outing_console_v9');
+      localStorage.removeItem('team_outing_console_v10');
       consoleData = JSON.parse(JSON.stringify(DEFAULT_CONSOLE_DATA));
       persistData();
       currentSlideIndex = 0;
