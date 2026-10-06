@@ -564,7 +564,7 @@
               <button onclick="pushCloudStateNow()" class="flex-1 py-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-400 border border-sky-500/40 font-party text-xs font-bold transition flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-cloud-arrow-up"></i> Push Config To Cloud Now
               </button>
-              <button onclick="pullCloudStateNow()" class="flex-1 py-2 rounded-xl bg-teal-500/20 hover:bg-teal-500/30 text-teal-400 border border-teal-500/40 font-party text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <button onclick="pullCloudStateNow(true)" class="flex-1 py-2 rounded-xl bg-teal-500/20 hover:bg-teal-500/30 text-teal-400 border border-teal-500/40 font-party text-xs font-bold transition flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-cloud-arrow-down"></i> Pull Cloud Data
               </button>
             </div>
@@ -1106,7 +1106,7 @@
           targetSlide.tagline = parsed.tagline || `${tone.toUpperCase()} • TOURNAMENT GUIDELINES`;
           targetSlide.timerDurationSec = parsed.timerDurationSec || 300;
           targetSlide.rules = parsed.rules || [];
-          saveData();
+          saveData(true);
           renderCurrentSlide();
           if (editingSlideId === targetSlide.id) {
             openSlideEditorModal(targetSlide.id);
@@ -1127,7 +1127,7 @@
             rules: parsed.rules || []
           };
           consoleData.slides.push(newSlide);
-          saveData();
+          saveData(true);
           goToSlide(consoleData.slides.length - 1);
         }
 
@@ -1457,12 +1457,13 @@
       }
     }
 
-    function saveData() {
+    function saveData(syncCloud = false) {
       try {
         localStorage.setItem('EVENT_CONSOLE_CONFIG_V2', JSON.stringify(consoleData));
       } catch(e) {
         console.warn("Save quota notice:", e);
       }
+      if (syncCloud) pushCloudStateNow();
     }
 
     function checkMobileFeedbackMode() {
@@ -2528,7 +2529,7 @@
 
           const compressedDataUrl = canvas.toDataURL('image/png', 0.85);
           consoleData.global.leftLogoUrl = compressedDataUrl;
-          saveData();
+          saveData(true);
           renderGlobalHeader();
 
           const prev = document.getElementById('adminLeftLogoPreview');
@@ -2542,7 +2543,7 @@
 
     function resetDefaultLogo() {
       consoleData.global.leftLogoUrl = DEFAULT_RECT_LOGO_SVG;
-      saveData();
+      saveData(true);
       renderGlobalHeader();
       const prev = document.getElementById('adminLeftLogoPreview');
       if (prev) prev.src = DEFAULT_RECT_LOGO_SVG;
@@ -2602,7 +2603,7 @@
       g.dateBadge = document.getElementById('adminDateBadgeInput').value.trim();
       g.publicHostedUrl = document.getElementById('adminPublicHostedUrlInput').value.trim();
 
-      saveData();
+      saveData(true);
       renderGlobalHeader();
       renderCurrentSlide();
       showToast("Header & brand settings updated! ✨", true);
@@ -2636,16 +2637,26 @@
       showToast("Link copied to clipboard! 📋", true);
     }
 
-    function applyNewRoomId() {
+    async function applyNewRoomId() {
       const input = document.getElementById('adminRoomIdInput');
       if (!input) return;
+      const previousRoomId = consoleData.global.roomId || 'outing-goa-2026';
       const newRoom = input.value.trim() || 'outing-goa-2026';
       consoleData.global.roomId = newRoom;
       saveData();
       updateDisplayLiveUrlField();
       renderFeedbackQrCode();
-      showToast(`Switched to room: ${newRoom}`, true);
-      pullCloudStateNow();
+      const pullResult = await pullCloudStateNow(true);
+      if (pullResult === 'missing') {
+        await pushCloudStateNow();
+      } else if (!pullResult) {
+        consoleData.global.roomId = previousRoomId;
+        input.value = previousRoomId;
+        saveData();
+        updateDisplayLiveUrlField();
+        renderFeedbackQrCode();
+        showToast(`Could not connect to room: ${newRoom}. Room unchanged.`, false);
+      }
     }
 
     function resetFeedbackToZero() {
@@ -2665,45 +2676,74 @@
 
       const roomId = consoleData.global.roomId || 'outing-goa-2026';
       try {
-        await fetch(`https://kvdb.io/4y96j3p6vD4yJ896rE3K7m/${roomId}`, {
+        const response = await fetch(`https://kvdb.io/4y96j3p6vD4yJ896rE3K7m/${encodeURIComponent(roomId)}`, {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(consoleData)
         });
+        if (!response.ok) {
+          const details = (await response.text()).trim();
+          throw new Error(details || `HTTP ${response.status} ${response.statusText}`);
+        }
         if (badge) badge.textContent = "Synced ✓";
         showToast("State pushed to cloud room! ☁️", true);
+        return true;
       } catch(e) {
-        if (badge) badge.textContent = "Local Only";
+        if (badge) badge.textContent = "Sync Failed";
         console.warn("Cloud push note:", e);
+        showToast(`Cloud sync failed: ${e.message}`, false);
+        return false;
       }
     }
 
-    async function pullCloudStateNow() {
+    async function pullCloudStateNow(notify = false) {
       const roomId = consoleData.global.roomId || 'outing-goa-2026';
       try {
-        const res = await fetch(`https://kvdb.io/4y96j3p6vD4yJ896rE3K7m/${roomId}`);
-        if (res.ok) {
-          const cloudConfig = await res.json();
-          if (cloudConfig && cloudConfig.slides) {
-            consoleData = cloudConfig;
-            saveData();
-            renderGlobalHeader();
-            renderCurrentSlide();
-            renderMarquee();
-            showToast("Updated with latest cloud data! 🔄", true);
-          }
+        const res = await fetch(`https://kvdb.io/4y96j3p6vD4yJ896rE3K7m/${encodeURIComponent(roomId)}`, { cache: 'no-store' });
+        if (res.status === 404) {
+          const details = (await res.text()).trim();
+          if (/bucket not found/i.test(details)) throw new Error(details);
+          if (notify) showToast(`No saved data for room: ${roomId}`, false);
+          return 'missing';
         }
+        if (!res.ok) {
+          const details = (await res.text()).trim();
+          throw new Error(details || `HTTP ${res.status} ${res.statusText}`);
+        }
+
+        const cloudConfig = await res.json();
+        if (!cloudConfig || !Array.isArray(cloudConfig.slides)) {
+          throw new Error('The cloud room contains an invalid configuration.');
+        }
+        if ((consoleData.global.roomId || 'outing-goa-2026') !== roomId) return 'stale';
+
+        consoleData = cloudConfig;
+        consoleData.global = consoleData.global || {};
+        consoleData.global.roomId = roomId;
+        saveData();
+        renderGlobalHeader();
+        renderCurrentSlide();
+        renderMarquee();
+        if (notify) showToast(`Loaded cloud room: ${roomId}`, true);
+        return 'loaded';
       } catch(e) {
         console.warn("Cloud pull note:", e);
+        const badge = document.getElementById('adminSyncStatusBadge');
+        if (badge) badge.textContent = "Sync Failed";
+        if (notify) showToast(`Cloud pull failed: ${e.message}`, false);
+        return null;
       }
     }
 
     function initLiveCloudPolling() {
-      setInterval(() => {
+      const pullCurrentRoom = () => {
         const params = new URLSearchParams(window.location.search);
         if (params.get('mode') !== 'feedback') {
           pullCloudStateNow();
         }
-      }, 12000);
+      };
+      pullCurrentRoom();
+      setInterval(pullCurrentRoom, 12000);
     }
 
     function openQrUrlModal() {
@@ -2731,7 +2771,7 @@
       }
 
       consoleData.global.publicHostedUrl = val;
-      saveData();
+      saveData(true);
       closeQrUrlModal();
       renderFeedbackQrCode();
       updateDisplayLiveUrlField();
@@ -2815,7 +2855,7 @@
       if (currentSlideIndex >= consoleData.slides.length) {
         currentSlideIndex = consoleData.slides.length - 1;
       }
-      saveData();
+      saveData(true);
       renderAdminSlidesList();
       renderCurrentSlide();
       showToast("Slide removed.", true);
@@ -2886,7 +2926,7 @@
       }
 
       consoleData.slides.push(newSlide);
-      saveData();
+        saveData(true);
       closeTemplatePickerModal();
       renderAdminSlidesList();
       goToSlide(consoleData.slides.length - 1);
@@ -2919,7 +2959,7 @@
         tag: "OUTING"
       };
       consoleData.schedule.push(newItm);
-      saveData();
+      saveData(true);
       renderAdminScheduleList();
       renderMarquee();
       showToast("Schedule item added.", true);
@@ -2927,7 +2967,7 @@
 
     function removeScheduleItem(id) {
       consoleData.schedule = consoleData.schedule.filter(i => i.id !== id);
-      saveData();
+      saveData(true);
       renderAdminScheduleList();
       renderMarquee();
       showToast("Schedule item removed.", true);
