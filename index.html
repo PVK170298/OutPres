@@ -2774,6 +2774,12 @@
             </div>
           </div>
           <div class="flex items-center gap-1.5">
+            <button onclick="moveSlide(${idx}, -1)" title="Move slide up" aria-label="Move ${s.title || 'slide'} up" ${idx === 0 ? 'disabled' : ''} class="w-7 h-7 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 flex items-center justify-center transition">
+              <i class="fa-solid fa-arrow-up text-[10px]"></i>
+            </button>
+            <button onclick="moveSlide(${idx}, 1)" title="Move slide down" aria-label="Move ${s.title || 'slide'} down" ${idx === consoleData.slides.length - 1 ? 'disabled' : ''} class="w-7 h-7 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 flex items-center justify-center transition">
+              <i class="fa-solid fa-arrow-down text-[10px]"></i>
+            </button>
             <button onclick="openSlideEditorModal('${s.id}')" class="px-2.5 py-1 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-400 font-mono text-xs transition">
               <i class="fa-solid fa-pen text-[10px]"></i> Edit
             </button>
@@ -2783,6 +2789,21 @@
           </div>
         </div>
       `).join('');
+    }
+
+    function moveSlide(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= consoleData.slides.length) return;
+
+      const activeSlideId = consoleData.slides[currentSlideIndex]?.id;
+      const [slide] = consoleData.slides.splice(index, 1);
+      consoleData.slides.splice(targetIndex, 0, slide);
+      currentSlideIndex = consoleData.slides.findIndex(s => s.id === activeSlideId);
+
+      saveData();
+      renderAdminSlidesList();
+      renderCurrentSlide();
+      pushCloudStateNow();
     }
 
     function deleteSlide(id) {
